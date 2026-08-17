@@ -1,26 +1,570 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ==========================================================================
+   NPeripheral — "Appear to your audience."
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+   Design thesis: this page is composed, not decorated.
+   - One flat ground per chapter. No gradient soup.
+   - One accent (ember). It is used for emphasis, never for decoration.
+   - Rule of thirds. Emptiness is a material, not wasted space.
+   - Editorial serif for voice, mono for instrumentation, sans for reading.
+   ========================================================================== */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@theme {
+  /* --- Ground: warm ink ------------------------------------------------- */
+  --color-ink: #0b0a09;
+  --color-ink-2: #121010;
+  --color-ink-3: #1a1716;
+  --color-ink-4: #262120;
+
+  /* --- Ground: cream (inverted chapters) -------------------------------- */
+  --color-cream: #f2ece1;
+  --color-cream-2: #e8e0d2;
+  --color-cream-3: #dcd2c1;
+
+  /* --- Ink-on-cream / bone-on-ink -------------------------------------- */
+  --color-bone: #f4efe6;
+  --color-dim: #a29a90;
+  /* Lifted off the original #6d655c, which only reached 3.4:1 on ink — the
+     mono labels set in it are 10–11px and need AA. This clears 5.5:1. */
+  --color-faint: #8f877d;
+
+  /* --- Accent: a single ember ------------------------------------------ */
+  --color-ember: #e2542a;
+  --color-ember-2: #f0894b;
+  --color-ember-ink: #8f2f13;
+
+  /* --- Hairlines -------------------------------------------------------- */
+  --color-line: rgba(244, 239, 230, 0.14);
+  --color-line-soft: rgba(244, 239, 230, 0.07);
+  --color-line-ink: rgba(11, 10, 9, 0.16);
+  --color-line-ink-soft: rgba(11, 10, 9, 0.08);
+
+  /* --- Legacy aliases ---------------------------------------------------
+     Older pages still reference the previous palette. Rather than leave
+     them stranded on a dead system, they resolve into the new one.       */
+  --color-brand-purple: #e2542a;
+  --color-brand-blue: #b8552f;
+  --color-brand-coral: #f0894b;
+  --color-brand-lime: #f0894b;
+  --color-brand-black: #0b0a09;
+  --color-brand-white: #f4efe6;
+  --color-surface-0: #0b0a09;
+  --color-surface-1: #121010;
+  --color-surface-2: #1a1716;
+  --color-surface-3: #262120;
+  --color-surface-border: rgba(244, 239, 230, 0.14);
+  --color-muted: #a29a90;
+  --color-muted-2: #6d655c;
+
+  /* --- Type ------------------------------------------------------------- */
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
+
+  /* --- Motion ----------------------------------------------------------- */
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* --- Radii: nearly none. Editorial pages have corners.
+     The whole scale is flattened so that any legacy `rounded-*` class in the
+     codebase resolves to a hairline radius rather than a soft SaaS pill.
+     `rounded-full` is untouched — it is reserved for buttons. ------------- */
+  --radius-xs: 2px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+  --radius-2xl: 3px;
+  --radius-3xl: 3px;
+  --radius-4xl: 3px;
+
+  --animate-marquee: marquee 42s linear infinite;
+  --animate-marquee-slow: marquee 80s linear infinite;
+  --animate-drift: drift 22s ease-in-out infinite;
+  --animate-aperture: aperture 9s ease-in-out infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  @keyframes drift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(0, -2%, 0) scale(1.04);
+    }
+  }
+
+  @keyframes aperture {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 0.9;
+    }
   }
 }
 
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+  --nav-h: 76px;
+}
+
+html {
+  background: var(--color-ink);
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Lenis drives scrolling; native smooth scroll would fight it. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ink);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-ember);
+  color: var(--color-bone);
+}
+
+/* A hairline scrollbar. Chrome should be quiet. */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ink);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-ink-4);
+  border: 3px solid var(--color-ink);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ember-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ember-2);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-variation-settings: "SOFT" 0, "WONK" 1;
+}
+
+/* ==========================================================================
+   Typographic scale
+   Fluid, composed against a 1440px reference. Used everywhere so headings
+   never drift out of relationship with each other.
+   ========================================================================== */
+
+@utility type-hero {
+  font-family: var(--font-display);
+  font-size: clamp(3.15rem, 9.2vw, 8.75rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  font-weight: 400;
+}
+
+@utility type-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6.4vw, 5.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.028em;
+  font-weight: 400;
+}
+
+@utility type-h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.4vw, 3.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.024em;
+  font-weight: 400;
+}
+
+@utility type-h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+}
+
+@utility type-lead {
+  font-size: clamp(1.05rem, 1.45vw, 1.3rem);
+  line-height: 1.55;
+  letter-spacing: -0.011em;
+}
+
+@utility type-body {
+  font-size: 1rem;
+  line-height: 1.68;
+  letter-spacing: -0.006em;
+}
+
+@utility type-small {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  letter-spacing: -0.003em;
+}
+
+/* Instrumentation: indices, metadata, eyebrows, coordinates. */
+@utility type-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+@utility type-label-sm {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  line-height: 1;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Oversized numerals for stats and chapter indices. */
+@utility type-numeral {
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 7vw, 6.5rem);
+  line-height: 0.86;
+  letter-spacing: -0.04em;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-weight: 400;
+}
+
+@utility italic-voice {
+  font-style: italic;
+  font-variation-settings: "SOFT" 40, "WONK" 1;
+}
+
+/* ==========================================================================
+   Chapter grounds
+   Each section declares its ground; children read from it. This is what
+   keeps colour honest across ~20 sections.
+   ========================================================================== */
+
+@utility ground-ink {
+  background: var(--color-ink);
+  color: var(--color-bone);
+  --rule: var(--color-line);
+  --rule-soft: var(--color-line-soft);
+  --quiet: var(--color-dim);
+  --quieter: var(--color-faint);
+}
+
+@utility ground-ink-2 {
+  background: var(--color-ink-2);
+  color: var(--color-bone);
+  --rule: var(--color-line);
+  --rule-soft: var(--color-line-soft);
+  --quiet: var(--color-dim);
+  --quieter: var(--color-faint);
+}
+
+@utility ground-cream {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  --rule: var(--color-line-ink);
+  --rule-soft: var(--color-line-ink-soft);
+  --quiet: #554f47;
+  --quieter: #6f675e;
+  /* The accent is re-darkened for light grounds. Same hue, same read, but
+     the 11px mono labels set in it clear AA here as well as they do on ink. */
+  --color-ember: #b8401c;
+}
+
+@utility ground-ember {
+  background: var(--color-ember);
+  color: #fff6f1;
+  --rule: rgba(255, 246, 241, 0.28);
+  --rule-soft: rgba(255, 246, 241, 0.14);
+  --quiet: rgba(255, 246, 241, 0.82);
+  --quieter: rgba(255, 246, 241, 0.6);
+}
+
+@utility rule-t {
+  border-top: 1px solid var(--rule, var(--color-line));
+}
+@utility rule-b {
+  border-bottom: 1px solid var(--rule, var(--color-line));
+}
+@utility rule-l {
+  border-left: 1px solid var(--rule, var(--color-line));
+}
+@utility rule-r {
+  border-right: 1px solid var(--rule, var(--color-line));
+}
+@utility text-quiet {
+  color: var(--quiet, var(--color-dim));
+}
+@utility text-quieter {
+  color: var(--quieter, var(--color-faint));
+}
+
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+
+@utility shell {
+  width: 100%;
+  max-width: 92rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+  @media (width >= 48rem) {
+    padding-inline: 2.5rem;
+  }
+  @media (width >= 80rem) {
+    padding-inline: 4rem;
+  }
+}
+
+/* Full-bleed within a shell parent. */
+@utility bleed {
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+}
+
+/* The composition grid the whole site is measured against. */
+@utility thirds {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  @media (width >= 64rem) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3rem;
+  }
+}
+
+/* ==========================================================================
+   Surfaces & effects — used sparingly
+   ========================================================================== */
+
+@utility glass {
+  background: color-mix(in oklab, var(--color-ink) 72%, transparent);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  border: 1px solid var(--color-line);
+}
+
+@utility glass-strong {
+  background: color-mix(in oklab, var(--color-ink) 88%, transparent);
+  backdrop-filter: blur(24px) saturate(130%);
+  -webkit-backdrop-filter: blur(24px) saturate(130%);
+  border: 1px solid var(--color-line);
+}
+
+/* Legacy gradient utilities resolve to flat ember — the reference is
+   explicit that flat colour reads more expensive than a gradient. */
+@utility bg-gradient-brand {
+  background-color: var(--color-ember);
+  background-image: none;
+}
+
+@utility text-gradient-brand {
+  color: var(--color-ember-2);
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+}
+
+@utility bg-mesh {
+  background-color: var(--color-ink);
+  background-image: radial-gradient(
+    120% 80% at 78% 12%,
+    color-mix(in oklab, var(--color-ember) 16%, transparent),
+    transparent 62%
+  );
+}
+
+@utility glow-purple {
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-ember) 30%, transparent);
+}
+@utility glow-blue {
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-ember) 30%, transparent);
+}
+@utility glow-coral {
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-ember-2) 30%, transparent);
+}
+@utility glow-lime {
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-ember-2) 30%, transparent);
+}
+
+@utility btn-ring {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Film grain. One layer, page-wide, cheap. */
+@utility grain {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.055;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+@utility noise-overlay {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* A link that draws its own underline on approach. */
+@utility link-underline {
+  position: relative;
+  display: inline-block;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.15em;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s var(--ease-premium);
+  }
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+/* Text that arrives one line at a time from behind a mask. */
+@utility line-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+/* ==========================================================================
+   Motion accessibility
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Route transitions
+   Driven by <ViewTransition default="np-page"> in app/template.tsx. The old
+   page leaves fast; the new one waits for it to clear, then rises in.
+   Browsers without the View Transitions API simply swap, as before.
+   ========================================================================== */
+
+::view-transition-old(.np-page) {
+  animation: 180ms cubic-bezier(0.65, 0, 0.35, 1) both np-page-out;
+}
+
+::view-transition-new(.np-page) {
+  animation: 420ms cubic-bezier(0.16, 1, 0.3, 1) 140ms both np-page-in;
+}
+
+@keyframes np-page-out {
+  to {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes np-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(.np-page),
+  ::view-transition-new(.np-page) {
+    animation: none;
+  }
+}
+
+/* The sticky mobile action bar reserves its own room, so the last line of a
+   page is never hidden behind it. */
+body.has-sticky-cta {
+  padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+}
+
+@media (width >= 48rem) {
+  body.has-sticky-cta {
+    padding-bottom: 0;
+  }
+}
+
+/* The cursor is replaced on fine-pointer devices only. */
+@media (hover: hover) and (pointer: fine) {
+  html.has-custom-cursor,
+  html.has-custom-cursor a,
+  html.has-custom-cursor button,
+  html.has-custom-cursor [role="button"] {
+    cursor: none;
+  }
 }
