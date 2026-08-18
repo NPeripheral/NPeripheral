@@ -7,6 +7,34 @@ function normaliseUrl(value: string | undefined): string {
   return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
 }
 
+const FALLBACK_SITE_URL = "https://www.nperipheral.com";
+
+/**
+ * The canonical origin, resolved defensively.
+ *
+ * `process.env.X ?? default` is not enough here: an environment variable that
+ * exists but is empty — the usual result of adding it in a host dashboard and
+ * leaving the value blank — is the empty string, which `??` happily passes
+ * through. `new URL("")` then throws ERR_INVALID_URL and the whole build dies
+ * on metadataBase.
+ *
+ * So: treat blank as absent, add a missing protocol, drop a trailing slash,
+ * fall back to Vercel's own deployment URL when it is available, and only
+ * then to the production default. Any of the usual misconfigurations produce
+ * a working site rather than a failed build.
+ */
+function resolveSiteUrl(): string {
+  const explicit = normaliseUrl(process.env.NEXT_PUBLIC_SITE_URL);
+  if (explicit) return explicit.replace(/\/+$/, "");
+
+  // Vercel injects these automatically; use them before guessing.
+  const vercel =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim() || process.env.VERCEL_URL?.trim();
+  if (vercel) return `https://${vercel.replace(/^https?:\/\//i, "").replace(/\/+$/, "")}`;
+
+  return FALLBACK_SITE_URL;
+}
+
 export const siteConfig = {
   name: "NPeripheral",
   motto: "Appear to your audience.",
@@ -14,7 +42,7 @@ export const siteConfig = {
     "Social media marketing that helps your business build a stronger online presence and show up consistently in front of the right people.",
   description:
     "NPeripheral is a social media marketing and management company helping businesses build a consistent, intentional online presence. Custom plans built around your platforms, goals and budget. Serving Fort Worth, Texas and clients nationwide.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.nperipheral.com",
+  url: resolveSiteUrl(),
   ogImage: "/opengraph-image",
 
   /* --- Contact ---------------------------------------------------------- */
