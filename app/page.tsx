@@ -44,14 +44,15 @@ export const metadata = {
  * horizontal run, a ruled set of advantages), and cream lands harder at
  * pricing for the wait:
  *
- *   00 hero           ink      thirds, figure right
+ *   00 hero           sea      thirds, figure right; the one chapter
+ *                              that leaves the warm ground
  *      ticker         ember    horizontal motion
  *   01 premise        cream    single centred column
  *   02 services       ink      ruled list, cursor-tracked panel
  *   03 where you are  ink      three states + figure
  *   04 before/after   ink→cream  pinned wipe
  *   05 our work       ink      concept projects, badged
- *   06 process        ink      pinned horizontal run
+ *   06 process        black    submarine blueprint, white on black only
  *   07 getting started ink     the invitation, in place of testimonials
  *   08 why us         ink      ruled advantages
  *   09 pricing        cream    quote factors

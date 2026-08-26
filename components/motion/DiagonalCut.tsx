@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 type DiagonalCutProps = {
-  /** Match the section's cut-top-reverse. Used once, at the Diptych. */
+  /** Match a section's cut-top-reverse. Currently unused -- see globals.css. */
   reverse?: boolean;
   className?: string;
 };

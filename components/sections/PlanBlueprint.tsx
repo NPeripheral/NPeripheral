@@ -1,11 +1,17 @@
 "use client";
 
 import { Reveal } from "@/components/motion/Reveal";
-import { DiagonalCut } from "@/components/motion/DiagonalCut";
 import { SubmarineBlueprint } from "@/components/visual/SubmarineBlueprint";
 
 /**
  * Chapter 06 — the plan of work, drawn as a submarine cutaway.
+ *
+ * No diagonal cut here, deliberately. This section follows WorkSection, which is
+ * ground-ink (#0b0a09), and this one is #000 — about a one-unit luminance step.
+ * globals.css states the rule itself: a cut "only works where the ground
+ * actually changes", and over a matching ground the notch is invisible while
+ * the hairline still draws. That is a white diagonal line with nothing behind
+ * it, which is decoration — the exact thing the thesis forbids.
  *
  * This chapter is deliberately monochrome: white on black, nothing else. The
  * rest of the page keeps the warm ink/ember system; this one section drops the
@@ -17,10 +23,9 @@ export function PlanBlueprint() {
   return (
     <section
       id="process"
-      className="cut-top relative bg-black py-24 text-white md:py-36"
+      className="relative bg-black py-24 text-white md:py-36"
       aria-labelledby="plan-heading"
     >
-      <DiagonalCut className="text-white" />
 
       <div className="shell relative z-10">
         <Reveal mode="fade">

@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
@@ -14,17 +15,21 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * one. The consequence is that a string the source builds up from parts cannot
  * be matched, and the editor says so rather than pretending.
  */
-const EDITABLE = "h1,h2,h3,h4,p,li,dd,dt,figcaption,blockquote,span,a,button";
+// Anchors and buttons are deliberately excluded: contenteditable does not
+// suppress their activation, so clicking one to edit its label navigates away
+// or toggles the control mid-edit.
+const EDITABLE = "h1,h2,h3,h4,p,li,dd,dt,figcaption,blockquote,span";
 
 type Status = { kind: "idle" | "saving" | "saved" | "error"; message?: string };
 
 export function EditMode() {
   const [on, setOn] = useState(false);
+  const pathname = usePathname();
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const original = useRef<string>("");
 
   const save = useCallback(async (el: HTMLElement) => {
-    const next = (el.innerText ?? "").trim();
+    const next = (el.textContent ?? "").trim();
     const prev = original.current;
     if (!prev || next === prev) return;
 
@@ -39,13 +44,13 @@ export function EditMode() {
       if (!res.ok) {
         // Put the original back: the file did not change, so the page must not
         // pretend it did.
-        el.innerText = prev;
+        el.textContent = prev;
         setStatus({ kind: "error", message: data.error ?? "Could not save." });
         return;
       }
       setStatus({ kind: "saved", message: data.file });
     } catch {
-      el.innerText = prev;
+      el.textContent = prev;
       setStatus({ kind: "error", message: "Could not reach the dev server." });
     }
   }, []);
@@ -53,6 +58,9 @@ export function EditMode() {
   useEffect(() => {
     if (!on) return;
 
+    // Re-read on every pathname change: this component lives in the layout and
+    // survives navigation, so a single snapshot leaves the toggle claiming to
+    // be on while every node it wired is detached.
     const nodes = Array.from(document.querySelectorAll<HTMLElement>(EDITABLE)).filter(
       (el) =>
         // leaf text only: editing a container would rewrite its children too
@@ -62,7 +70,11 @@ export function EditMode() {
     );
 
     const onFocus = (e: Event) => {
-      original.current = ((e.target as HTMLElement).innerText ?? "").trim();
+      // textContent, not innerText: innerText is text-transform aware, so every
+      // `type-label` element (uppercase, and most of the site's instrumentation
+      // type) reported its RENDERED caps and never matched the source. The user
+      // saw "could not find that text" on copy that was plainly there.
+      original.current = ((e.target as HTMLElement).textContent ?? "").trim();
       setStatus({ kind: "idle" });
     };
     const onBlur = (e: Event) => void save(e.target as HTMLElement);
@@ -72,7 +84,7 @@ export function EditMode() {
         (e.target as HTMLElement).blur();
       }
       if (e.key === "Escape") {
-        (e.target as HTMLElement).innerText = original.current;
+        (e.target as HTMLElement).textContent = original.current;
         (e.target as HTMLElement).blur();
       }
     };
@@ -94,9 +106,11 @@ export function EditMode() {
         el.removeEventListener("keydown", onKey as EventListener);
       });
     };
-  }, [on, save]);
+  }, [on, save, pathname]);
 
-  if (process.env.NODE_ENV === "production") return null;
+  // Allowlist, not denylist: any NODE_ENV that is not literally "development"
+  // (test, staging, unset behind a custom server) must not render this.
+  if (process.env.NODE_ENV !== "development") return null;
 
   return (
     <div

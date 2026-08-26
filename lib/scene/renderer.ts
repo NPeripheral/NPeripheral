@@ -75,7 +75,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
   let raf = 0;
   let last = performance.now();
   let t = 0;
-  let visible = true;
+  let visible = !document.hidden;
   let running = false;
   let destroyed = false;
 
@@ -174,7 +174,6 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
     const k = reduced ? 1 : 1 - Math.exp(-dt * 3);
     current.openness += (target.openness - current.openness) * k;
     current.separation += (target.separation - current.separation) * k;
-    current.distance += (target.distance - current.distance) * k;
     current.spin += (target.spin - current.spin) * k;
 
     aperture.apply(current, reduced ? 0 : t);
@@ -202,6 +201,25 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
     draw();
   } else {
     start();
+  }
+
+  // Under reduced motion there is no render loop, so nothing re-runs
+  // placeAperture() as the page scrolls -- the canvas is fixed but the slot is
+  // not, and the iris would sit frozen at its first viewport position, drifting
+  // across unrelated sections. Motion the user asked to avoid, produced by the
+  // code meant to avoid it. One rAF-throttled re-place per scroll keeps the
+  // figure in its box without ever starting the loop.
+  let stillFrame = 0;
+  const onStillScroll = () => {
+    if (!reduced || stillFrame) return;
+    stillFrame = requestAnimationFrame(() => {
+      stillFrame = 0;
+      placeAperture();
+      draw();
+    });
+  };
+  if (reduced) {
+    window.addEventListener("scroll", onStillScroll, { passive: true });
   }
 
   const onVisibility = () => {
@@ -258,6 +276,8 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("resize", onResize);
       gateObserver?.disconnect();
+      cancelAnimationFrame(stillFrame);
+      window.removeEventListener("scroll", onStillScroll);
       aperture.dispose();
       leaves.dispose();
       ocean.dispose();

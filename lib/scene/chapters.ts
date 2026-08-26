@@ -13,23 +13,21 @@ export interface ChapterState {
   openness: number;
   /** Blade separation along their own radius. */
   separation: number;
-  /** Camera distance. */
-  distance: number;
   /** Continuous rotation of the whole iris, rad/s. */
   spin: number;
 }
 
 export const CHAPTERS: Record<ChapterName, ChapterState> = {
   // Slow breathing iris, half open. The resting state.
-  home: { openness: 0.55, separation: 0.0, distance: 3.2, spin: 0.05 },
+  home: { openness: 0.55, separation: 0.0, spin: 0.05 },
   // Blades fan out and separate — the mechanism explained.
-  services: { openness: 0.75, separation: 0.35, distance: 3.6, spin: 0.09 },
-  // Blades stack into a lens barrel; the camera pushes through.
-  work: { openness: 0.4, separation: 0.12, distance: 2.3, spin: 0.03 },
+  services: { openness: 0.75, separation: 0.35, spin: 0.09 },
+  // Blades stack toward closed; the iris tightens.
+  work: { openness: 0.4, separation: 0.12, spin: 0.03 },
   // Iris closes to a slit. Never to a point — real irises do not.
-  contact: { openness: 0.08, separation: 0.0, distance: 3.0, spin: 0.02 },
+  contact: { openness: 0.08, separation: 0.0, spin: 0.02 },
   // Legal, help, about: near-still. Nothing should move under a privacy policy.
-  quiet: { openness: 0.45, separation: 0.0, distance: 3.4, spin: 0.0 },
+  quiet: { openness: 0.45, separation: 0.0, spin: 0.0 },
 };
 
 export function chapterForPath(pathname: string): ChapterName {

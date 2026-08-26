@@ -105,7 +105,12 @@
      6.5° is derived, not chosen: the 1344px shell gives 416px columns and
      48px gutters, and atan(48/416) = 6.58°. Expressing the rise in vw keeps
      the angle constant at every breakpoint. */
-  --cut-rise: 11.5vw;
+  /* Clamped, not raw vw. cut-top pulls a section up by a full rise, so at
+     1920px an unbounded 11.5vw = 221px overlaps 77px of the previous chapter's
+     content (its padding is 144px), and 150px at 2560px -- more than a line of
+     body copy, swallowed opaquely. The clamp holds the 6.5deg angle across the
+     range people actually browse at and stops eating content past it. */
+  --cut-rise: clamp(48px, 11.5vw, 144px);
 
   /* --- Radii: nearly none. Editorial pages have corners.
      The whole scale is flattened so that any legacy `rounded-*` class in the
@@ -406,9 +411,11 @@ h4,
   padding-top: var(--cut-rise);
 }
 
-/* Reversed rake. Used exactly once, at DiptychSection, where the meaning
-   itself reverses. A second use makes it variety; one use makes it an
-   argument. */
+/* Reversed rake. Reserved for the one boundary where the meaning itself
+   reverses -- currently unused: with ground-ink-2 retired, StarterSection and
+   DiptychSection share a ground, so the Diptych's top edge has no boundary to
+   rake and its reversal lives in its own internal A/B seam instead. Kept
+   because a second direction must exist for the first to read as a choice. */
 @utility cut-top-reverse {
   margin-top: calc(-1 * var(--cut-rise));
   clip-path: polygon(0 var(--cut-rise), 100% 0, 100% 100%, 0 100%);
@@ -439,6 +446,14 @@ h4,
    ========================================================================== */
 
 @utility shell {
+  /* Lifts page content above the fixed scene canvas (z-5).
+     Without this the leaves composite OVER body copy on every section that
+     does not lift its own content: at 0.42 opacity a cream-3 leaf drops
+     ink-on-cream from 17.4:1 to 2.49:1, and on ground-ember to 1.93:1 --
+     below AA even for large text. Setting it here rather than per-section
+     means a new section cannot forget it. */
+  position: relative;
+  z-index: 10;
   width: 100%;
   max-width: 92rem;
   margin-inline: auto;

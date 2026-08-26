@@ -13,7 +13,7 @@ const FALLBACK: Record<string, string> = {
   "--color-cream-3": "#dcd2c1",
   "--color-bone": "#f4efe6",
   "--color-sea-light": "#bfe8f5",
-  "--color-sea": "#4aa3c4",
+  "--color-sea": "#26708c",
   "--color-sea-deep": "#0d3b52",
   "--color-sea-floor": "#06222f",
   "--color-sand": "#c9b48c",

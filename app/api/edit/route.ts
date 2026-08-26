@@ -35,8 +35,10 @@ function isLoopbackHost(host: string | null): boolean {
 }
 
 export async function POST(request: Request) {
-  // 1. Never exists in production.
-  if (process.env.NODE_ENV === "production") {
+  // 1. Development only -- an allowlist, not a denylist. `!== "production"`
+  //    would leave a filesystem-write endpoint live under NODE_ENV=test,
+  //    staging, or unset behind a custom server calling next({dev:false}).
+  if (process.env.NODE_ENV !== "development") {
     return new NextResponse("Not found", { status: 404 });
   }
 
@@ -89,6 +91,24 @@ export async function POST(request: Request) {
   if (find.length < 3) {
     return NextResponse.json(
       { error: "Original text is too short to locate safely." },
+      { status: 400 },
+    );
+  }
+
+  // The replacement is written verbatim into TypeScript/JSX source, so a
+  // character that terminates a string or opens a JSX expression takes the dev
+  // server down. Typing a normal curly quote in `Fort "Worth", TX` would
+  // produce `value: "Fort "Worth", TX"` -- a syntax error from ordinary
+  // copy-editing. Refusing is right: silently escaping would put backslashes in
+  // the rendered page, which is a different kind of wrong.
+  const FORBIDDEN = /["`\\{}<>\r\n]/;
+  const offender = replace.match(FORBIDDEN);
+  if (offender) {
+    const shown = offender[0] === "\n" || offender[0] === "\r" ? "a line break" : `"${offender[0]}"`;
+    return NextResponse.json(
+      {
+        error: `Cannot save ${shown} -- it would break the source file. Straight quotes, braces, angle brackets and line breaks have to be edited in the file itself.`,
+      },
       { status: 400 },
     );
   }
