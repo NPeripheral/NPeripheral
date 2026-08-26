@@ -40,10 +40,10 @@ export function Hero() {
   return (
     <section
       ref={ref}
-      className="ground-ink relative flex min-h-[100svh] flex-col justify-between overflow-hidden pt-28 md:pt-32"
+      className="ground-sea relative flex min-h-[100svh] flex-col justify-between overflow-hidden pt-28 md:pt-32"
       aria-labelledby="hero-heading"
     >
-      <div className="shell grid flex-1 items-center gap-12 lg:grid-cols-12 lg:gap-10">
+      <div className="shell relative z-10 grid flex-1 items-center gap-12 lg:grid-cols-12 lg:gap-10">
         <motion.div
           style={reduced ? undefined : { y: typeY }}
           className="lg:col-span-7 lg:pr-10 xl:col-span-6"
@@ -73,11 +73,22 @@ export function Hero() {
             ]}
           />
 
+          {/* The line that names what the work actually is, and what the mark
+              on the masthead means. It arrives after the headline has landed. */}
+          <motion.p
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="type-lead mt-7 font-display text-[1.5rem] leading-tight text-bone"
+          >
+            We discover buried treasure.
+          </motion.p>
+
           <motion.p
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
-            className="type-lead mt-9 max-w-md text-quiet"
+            transition={{ duration: 0.9, delay: 0.95, ease: [0.16, 1, 0.3, 1] }}
+            className="type-lead mt-6 max-w-md text-quiet"
           >
             Social media marketing designed to help your business build a stronger online
             presence, connect with the right audience, and show up consistently.
@@ -132,7 +143,7 @@ export function Hero() {
         </motion.div>
       </div>
 
-      <motion.div style={reduced ? undefined : { opacity: fade }} className="shell pb-8 pt-14">
+      <motion.div style={reduced ? undefined : { opacity: fade }} className="shell relative z-10 pb-8 pt-14">
         <div className="rule-t flex flex-col gap-6 pt-6 sm:flex-row sm:items-end sm:justify-between">
           <dl className="flex flex-wrap gap-x-10 gap-y-5">
             {marks.map((mark, i) => (

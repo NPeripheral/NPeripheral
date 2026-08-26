@@ -2,6 +2,7 @@ import { OrthographicCamera, Scene, WebGLRenderer } from "three";
 import { CHAPTERS, type ChapterName, type ChapterState } from "./chapters";
 import { createAperture } from "./aperture";
 import { createLeaves } from "./leaves";
+import { createOcean } from "./ocean";
 import { palette } from "./palette";
 
 export interface SceneHandle {
@@ -36,7 +37,18 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
   const p = palette();
   const aperture = createAperture(p.ember);
   const leaves = createLeaves(p.ink4, p.ember);
-  scene.add(aperture.group, leaves.mesh);
+  const ocean = createOcean(p.seaLight, p.sea, p.ember);
+  scene.add(aperture.group, leaves.mesh, ocean.group);
+
+  // The ocean is the landing chapter only. Everywhere else the scene returns to
+  // the ink/ember register the rest of the site is built in.
+  let underwater = false;
+  function setUnderwater(on: boolean) {
+    underwater = on;
+    ocean.group.visible = on;
+    leaves.mesh.visible = !on;
+  }
+  setUnderwater(false);
 
   let target: ChapterState = { ...CHAPTERS.home };
   const current: ChapterState = { ...CHAPTERS.home };
@@ -103,7 +115,10 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
     current.spin += (target.spin - current.spin) * k;
 
     aperture.apply(current, reduced ? 0 : t);
-    if (!reduced) leaves.update(dt);
+    if (!reduced) {
+      if (underwater) ocean.update(dt, t);
+      else leaves.update(dt);
+    }
     placeAperture();
     renderer.render(scene, camera);
     raf = requestAnimationFrame(frame);
@@ -137,7 +152,9 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
   return {
     setChapter(name) {
       target = { ...CHAPTERS[name] };
+      setUnderwater(name === "home");
       if (!reduced) { leaves.burst(); start(); }
+      else { placeAperture(); renderer.render(scene, camera); }
     },
     setSlot(el) { slotEl = el; if (!reduced) start(); else { placeAperture(); renderer.render(scene, camera); } },
     resize() { sizeToViewport(); start(); },
@@ -148,6 +165,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
       window.removeEventListener("resize", onResize);
       aperture.dispose();
       leaves.dispose();
+      ocean.dispose();
       renderer.dispose();
     },
   };

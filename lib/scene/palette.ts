@@ -12,6 +12,10 @@ const FALLBACK: Record<string, string> = {
   "--color-ink-4": "#262120",
   "--color-cream-3": "#dcd2c1",
   "--color-bone": "#f4efe6",
+  "--color-sea-light": "#bfe8f5",
+  "--color-sea": "#4aa3c4",
+  "--color-sea-deep": "#0d3b52",
+  "--color-sea-floor": "#06222f",
 };
 
 export function cssColor(token: string): Color {
@@ -36,5 +40,9 @@ export function palette() {
     ink4: cssColor("--color-ink-4"),
     cream3: cssColor("--color-cream-3"),
     bone: cssColor("--color-bone"),
+    seaLight: cssColor("--color-sea-light"),
+    sea: cssColor("--color-sea"),
+    seaDeep: cssColor("--color-sea-deep"),
+    seaFloor: cssColor("--color-sea-floor"),
   };
 }

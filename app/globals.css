@@ -34,6 +34,15 @@
   --color-ember-2: #f0894b;
   --color-ember-ink: #8f2f13;
 
+  /* --- Underwater: the landing scene ------------------------------------
+     A separate register from the ink/ember system on purpose -- this is the
+     one chapter that leaves the warm ground. Sunlit shallows: a light shaft
+     colour, a mid body colour for the school, and a deep floor. */
+  --color-sea-light: #bfe8f5;
+  --color-sea: #4aa3c4;
+  --color-sea-deep: #0d3b52;
+  --color-sea-floor: #06222f;
+
   /* --- Hairlines -------------------------------------------------------- */
   --color-line: rgba(244, 239, 230, 0.14);
   --color-line-soft: rgba(244, 239, 230, 0.07);
@@ -337,6 +346,23 @@ h4,
   /* The accent is re-darkened for light grounds. Same hue, same read, but
      the 11px mono labels set in it clear AA here as well as they do on ink. */
   --color-ember: #b8401c;
+}
+
+/* The landing chapter, and the only place the site leaves its warm ground.
+   Sunlit shallows: a deep floor beneath, lighter toward the surface. The
+   3D shafts and school render over this, and page content sits above both. */
+@utility ground-sea {
+  background: linear-gradient(
+    180deg,
+    var(--color-sea) 0%,
+    var(--color-sea-deep) 58%,
+    var(--color-sea-floor) 100%
+  );
+  color: var(--color-bone);
+  --rule: rgba(244, 239, 230, 0.2);
+  --rule-soft: rgba(244, 239, 230, 0.1);
+  --quiet: #cfeaf4;
+  --quieter: #9fc9d8;
 }
 
 @utility ground-ember {
