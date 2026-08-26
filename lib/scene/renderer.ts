@@ -6,8 +6,13 @@ import { palette } from "./palette";
 
 export interface SceneHandle {
   setChapter: (name: ChapterName) => void;
-  /** Screen-space rect the aperture should occupy, from a SceneSlot. */
-  setSlot: (rect: DOMRect | null) => void;
+  /**
+   * The element whose rect the aperture should fill. Deliberately the ELEMENT,
+   * not a DOMRect: the hero figure animates in from y:102%, and Lenis
+   * smooth-scroll never fires a window scroll event, so any cached rect is
+   * wrong within a frame of being taken.
+   */
+  setSlot: (el: HTMLElement | null) => void;
   resize: () => void;
   destroy: () => void;
 }
@@ -35,7 +40,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
 
   let target: ChapterState = { ...CHAPTERS.home };
   const current: ChapterState = { ...CHAPTERS.home };
-  let slot: DOMRect | null = null;
+  let slotEl: HTMLElement | null = null;
 
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -59,7 +64,12 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
   }
 
   function placeAperture() {
-    if (!slot) {
+    if (!slotEl) {
+      aperture.group.visible = false;
+      return;
+    }
+    const slot = slotEl.getBoundingClientRect();
+    if (slot.width < 1 || slot.height < 1) {
       aperture.group.visible = false;
       return;
     }
@@ -129,7 +139,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
       target = { ...CHAPTERS[name] };
       if (!reduced) { leaves.burst(); start(); }
     },
-    setSlot(rect) { slot = rect; if (!reduced) start(); else { placeAperture(); renderer.render(scene, camera); } },
+    setSlot(el) { slotEl = el; if (!reduced) start(); else { placeAperture(); renderer.render(scene, camera); } },
     resize() { sizeToViewport(); start(); },
     destroy() {
       destroyed = true;

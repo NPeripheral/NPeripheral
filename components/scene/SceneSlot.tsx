@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Aperture, type ApertureTone } from "@/components/visual/Aperture";
 import { getSceneHandle } from "@/lib/scene/handle";
+import type { SceneHandle } from "@/lib/scene/renderer";
 import { cn } from "@/lib/utils";
 
 type SceneSlotProps = {
@@ -25,23 +26,35 @@ export function SceneSlot({ tone = "ink", label, index, className }: SceneSlotPr
 
   useEffect(() => {
     const el = ref.current;
-    const scene = getSceneHandle();
-    if (!el || !scene) return;
-    setLive(true);
+    if (!el) return;
 
-    const push = () => scene.setSlot(el.getBoundingClientRect());
-    push();
+    // The canvas is mounted in the layout and this slot is deep in the page, so
+    // there is no ordering guarantee between the two effects. Poll a few frames
+    // for the handle rather than losing the race and silently rendering nothing;
+    // if it never appears, WebGL genuinely is not available and the SVG
+    // fallback below is correct.
+    let scene: SceneHandle | null = null;
+    let raf = 0;
+    let tries = 0;
 
-    const ro = new ResizeObserver(push);
-    ro.observe(el);
-    window.addEventListener("scroll", push, { passive: true });
-    window.addEventListener("resize", push);
+    const push = () => scene?.setSlot(el);
+
+    const attach = () => {
+      scene = getSceneHandle();
+      if (!scene) {
+        if (tries++ < 60) {
+          raf = requestAnimationFrame(attach);
+        }
+        return;
+      }
+      setLive(true);
+      push();
+    };
+    attach();
 
     return () => {
-      ro.disconnect();
-      window.removeEventListener("scroll", push);
-      window.removeEventListener("resize", push);
-      scene.setSlot(null);
+      cancelAnimationFrame(raf);
+      scene?.setSlot(null);
     };
   }, []);
 
