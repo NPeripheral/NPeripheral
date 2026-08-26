@@ -116,7 +116,11 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.15 }}
-            className="type-label-sm mt-6 leading-[1.7] text-quieter"
+            /* On narrow viewports this line lands on the seabed, where white
+               measures 1.69:1. Same fix as the sill and the figure labels: its
+               own flat chip, rather than darkening sand until it stops reading
+               as sand. inline-block so the chip wraps the text, not the column. */
+            className="type-label-sm mt-6 inline-block bg-black/80 px-3 py-2 leading-[1.7] text-white"
           >
             {siteConfig.responsePromise}
           </motion.p>

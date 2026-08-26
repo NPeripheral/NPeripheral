@@ -101,7 +101,10 @@ export function EditMode() {
   return (
     <div
       data-edit-ui
-      className="fixed bottom-4 left-1/2 z-[200] -translate-x-1/2 select-none"
+      /* Right-aligned and lifted clear of the sticky mobile CTA, which owns
+         the bottom of the viewport on small screens -- centred at bottom-4 the
+         two controls sat on top of each other. */
+      className="fixed bottom-28 right-4 z-[200] select-none sm:bottom-4"
     >
       <div className="flex items-center gap-3 rounded-full border border-white/25 bg-black/90 px-4 py-2 text-white shadow-lg backdrop-blur">
         <button
