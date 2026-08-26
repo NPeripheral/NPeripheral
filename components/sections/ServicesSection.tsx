@@ -8,6 +8,7 @@ import { Aperture, type ApertureFigure } from "@/components/visual/Aperture";
 import { Reveal } from "@/components/motion/Reveal";
 import { Lines } from "@/components/motion/Lines";
 import { ArrowRight } from "@/components/ui/Button";
+import { DiagonalCut } from "@/components/motion/DiagonalCut";
 
 const FIGURES: Record<string, ApertureFigure> = {
   "social-media-management": "orbit",
@@ -52,7 +53,8 @@ export function ServicesSection() {
   }
 
   return (
-    <section id="services" className="ground-ink relative overflow-hidden py-24 md:py-36">
+    <section id="services" className="ground-ink cut-top relative py-24 md:py-36">
+      <DiagonalCut />
       <div className="shell">
         <div className="rule-b flex flex-col gap-8 pb-10 lg:flex-row lg:items-end lg:justify-between">
           <div>

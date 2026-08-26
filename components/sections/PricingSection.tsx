@@ -4,6 +4,7 @@ import { quoteFactors, quoteSteps } from "@/lib/data/pricing";
 import { Button, ArrowRight } from "@/components/ui/Button";
 import { Lines } from "@/components/motion/Lines";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
+import { DiagonalCut } from "@/components/motion/DiagonalCut";
 
 /**
  * Pricing.
@@ -15,7 +16,8 @@ import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
  */
 export function PricingSection() {
   return (
-    <section id="pricing" className="ground-cream relative py-24 md:py-36">
+    <section id="pricing" className="ground-cream cut-top relative py-24 md:py-36">
+      <DiagonalCut />
       <div className="shell">
         <div className="rule-b flex flex-col gap-6 pb-10 lg:flex-row lg:items-end lg:justify-between">
           <div>
