@@ -27,9 +27,47 @@ function isAllowed(abs: string) {
   return ALLOWED.some((dir) => rel === dir || rel.startsWith(dir + path.sep));
 }
 
+/** Loopback only. A host header naming anything else did not come from you. */
+function isLoopbackHost(host: string | null): boolean {
+  if (!host) return false;
+  const name = host.replace(/:\d+$/, "").replace(/^\[|\]$/g, "").toLowerCase();
+  return name === "localhost" || name === "127.0.0.1" || name === "::1";
+}
+
 export async function POST(request: Request) {
+  // 1. Never exists in production.
   if (process.env.NODE_ENV === "production") {
     return new NextResponse("Not found", { status: 404 });
+  }
+
+  // 2. Only from this machine. `next dev -H 127.0.0.1` already refuses off-box
+  //    connections, but this holds even if the server is later started on
+  //    0.0.0.0 or fronted by a tunnel -- the flag and the check would both have
+  //    to be undone.
+  if (!isLoopbackHost(request.headers.get("host"))) {
+    return new NextResponse("Not found", { status: 404 });
+  }
+
+  // 3. Only from this site's own pages. Without this, any website you happen to
+  //    have open could POST to localhost:3000 in the background and rewrite
+  //    your source files -- classic CSRF, and a dev server is a soft target
+  //    because it is trusted and unauthenticated. Browsers set Sec-Fetch-Site
+  //    themselves and page JavaScript cannot forge it.
+  const site = request.headers.get("sec-fetch-site");
+  if (site !== null && site !== "same-origin") {
+    return new NextResponse("Forbidden", { status: 403 });
+  }
+  const origin = request.headers.get("origin");
+  if (origin) {
+    let originHost: string | null = null;
+    try {
+      originHost = new URL(origin).host;
+    } catch {
+      return new NextResponse("Forbidden", { status: 403 });
+    }
+    if (!isLoopbackHost(originHost)) {
+      return new NextResponse("Forbidden", { status: 403 });
+    }
   }
 
   let body: { find?: string; replace?: string };
