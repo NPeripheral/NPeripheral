@@ -301,6 +301,8 @@ git commit -m "feat(motion): add Cascade entrance, 45ms/420ms on ease-snap"
 - Modify: `components/sections/WorkSection.tsx:24` — `ground-cream` → `ground-ink`
 - Modify: `components/sections/FaqSection.tsx:15` — `ground-cream` → `ground-ink`
 - Modify: `components/sections/JustGettingStarted.tsx:35` — `ground-ember` → `ground-ink`
+- Modify: `components/sections/StarterSection.tsx:34` — `ground-ink-2` → `ground-ink`
+- Modify: `components/sections/WhyChooseSection.tsx:17` — `ground-ink-2` → `ground-ink`
 - Modify: `lib/data/work.ts` — audit per-item `tone`
 - Modify: `app/page.tsx` — update the chapter comment to match reality
 
@@ -314,7 +316,15 @@ git commit -m "feat(motion): add Cascade entrance, 45ms/420ms on ease-snap"
 sed -i '' 's/ground-cream relative py-24 md:py-36/ground-ink relative py-24 md:py-36/' components/sections/WorkSection.tsx
 sed -i '' 's/ground-cream relative py-24 md:py-36/ground-ink relative py-24 md:py-36/' components/sections/FaqSection.tsx
 sed -i '' 's/ground-ember relative py-24 md:py-32/ground-ink relative py-24 md:py-32/' components/sections/JustGettingStarted.tsx
+sed -i '' 's/ground-ink-2 relative py-24 md:py-32/ground-ink relative py-24 md:py-32/' components/sections/StarterSection.tsx
+sed -i '' 's/ground-ink-2 relative py-24 md:py-36/ground-ink relative py-24 md:py-36/' components/sections/WhyChooseSection.tsx
 ```
+
+`ground-ink-2` is retired as a *chapter* ground per the spec — a ~7-unit
+luminance step against `ink` does not read at a full-bleed boundary, so
+`StarterSection` and `WhyChooseSection` were paying for a distinction the eye
+never receives. The utility itself stays, for panels *inside* an ink chapter
+where it has an adjacent edge to be measured against.
 
 - [ ] **Step 2: Verify exactly three files changed and the sequence is correct**
 
@@ -326,7 +336,14 @@ for s in Hero SignalTicker ManifestoSection ServicesSection StarterSection Dipty
 done
 ```
 
-Expected sequence: `ink, ember, cream, ink, ink-2, ink, ink, ink, ink, ink-2, cream, ink, ember, ink`. Work→Process→JustGettingStarted are now three consecutive ink chapters. That is intentional — composition, not colour, differentiates them.
+Expected sequence: `ink, ember, cream, ink, ink, ink, ink, ink, ink, ink, cream, ink, ember, ink`.
+
+Services through WhyChoose is now seven consecutive ink chapters. That is
+intentional and is the whole point of the correction: the page currently
+changes colour to avoid the harder work of changing composition. The diagonal
+cuts, the pinned horizontal `ProcessTimeline`, and the per-section
+compositional shifts do that work instead — and cream lands harder for the
+wait.
 
 - [ ] **Step 3: Audit work.ts tone**
 
@@ -349,26 +366,45 @@ git commit -m "refactor(design): correct ground rhythm, retire adjacent cream"
 
 ---
 
-### Task 6: Apply cuts at the five ground changes
+### Task 6: Apply cuts at the six ground changes
 
 **Files:**
-- Modify: `app/page.tsx`
+- Modify: `components/sections/ManifestoSection.tsx`
+- Modify: `components/sections/ServicesSection.tsx`
+- Modify: `components/sections/PricingSection.tsx`
+- Modify: `components/sections/FaqSection.tsx`
+- Modify: `components/sections/BrandStatement.tsx`
+- Modify: `components/sections/FinalCta.tsx`
+- Modify: `components/sections/DiptychSection.tsx` (internal A/B seam only)
+
+Do **not** edit `app/page.tsx` in this task — the cut classes live on the
+sections themselves. Task 5 owns the only `page.tsx` change.
 
 **Interfaces:**
 - Consumes: `.cut-top` / `.cut-top-reverse` (Task 2), `DiagonalCut` (Task 3)
 - Produces: the finished Stage 1 homepage
 
-- [ ] **Step 1: Identify the five boundaries**
+- [ ] **Step 1: Identify the six boundaries**
 
-After Task 5 the ground changes at exactly these seams:
+After Task 5 the chapter grounds change at exactly these seams. `SignalTicker`
+is excluded deliberately — it is a 60px rule, not a chapter, so it takes no cut.
 
-| # | Boundary | Class |
-| --- | --- | --- |
-| 1 | SignalTicker (ember) → Manifesto (cream) | `cut-top` |
-| 2 | Manifesto (cream) → Services (ink) | `cut-top` |
-| 3 | Starter (ink-2) → Diptych (ink) | `cut-top-reverse` |
-| 4 | WhyChoose (ink-2) → Pricing (cream) | `cut-top` |
-| 5 | Faq (ink) → BrandStatement (ember) | `cut-top` |
+| # | Boundary | Section carrying the class | Class |
+| --- | --- | --- | --- |
+| 1 | SignalTicker (ember) → Manifesto (cream) | `ManifestoSection` | `cut-top` |
+| 2 | Manifesto (cream) → Services (ink) | `ServicesSection` | `cut-top` |
+| 3 | WhyChoose (ink) → Pricing (cream) | `PricingSection` | `cut-top` |
+| 4 | Pricing (cream) → Faq (ink) | `FaqSection` | `cut-top` |
+| 5 | Faq (ink) → BrandStatement (ember) | `BrandStatement` | `cut-top` |
+| 6 | BrandStatement (ember) → FinalCta (ink) | `FinalCta` | `cut-top` |
+
+**The single reversal is internal to the Diptych.** With `ground-ink-2`
+retired, `StarterSection` and `DiptychSection` are both ink, so there is no
+boundary at the Diptych's top edge to rake. The place the meaning reverses is
+*inside* the section — panel A is ink ("before"), panel B is cream ("after").
+Apply `cut-top-reverse` and `<DiagonalCut reverse />` to panel B's container,
+not to the `<section>`. This is the only reversal on the page; a second use
+makes it variety rather than argument.
 
 - [ ] **Step 2: Apply to each boundary section**
 
