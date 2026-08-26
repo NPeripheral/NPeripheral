@@ -43,7 +43,11 @@
      one chapter that leaves the warm ground. Sunlit shallows: a light shaft
      colour, a mid body colour for the school, and a deep floor. */
   --color-sea-light: #bfe8f5;
-  --color-sea: #4aa3c4;
+  /* The surface stop is set by contrast, not by taste: white body text over
+     the old #4aa3c4 measured 2.87:1, well under AA. #26708c measures 5.56:1
+     and is still unmistakably sunlit water. Anything lighter here silently
+     breaks every headline and label in the chapter. */
+  --color-sea: #26708c;
   --color-sea-deep: #0d3b52;
   --color-sea-floor: #06222f;
   --color-sand: #c9b48c;

@@ -204,10 +204,17 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
 
   const onVisibility = () => {
     visible = !document.hidden;
-    if (visible) start();
+    // Guarded: without this, a reduced-motion user who switches tabs and back
+    // gets a permanently self-rescheduling render loop. Nothing visibly moves,
+    // but the promise was one still frame and stop -- not a silent battery cost.
+    if (visible && !reduced) start();
   };
   document.addEventListener("visibilitychange", onVisibility);
-  const onResize = () => { sizeToViewport(); start(); };
+  const onResize = () => {
+    sizeToViewport();
+    if (reduced) { placeAperture(); draw(); return; }
+    start();
+  };
   window.addEventListener("resize", onResize);
 
   return {

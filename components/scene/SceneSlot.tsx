@@ -73,8 +73,16 @@ export function SceneSlot({ tone = "ink", label, index, className }: SceneSlotPr
         />
       ) : (
         <>
-          <span className="type-label-sm absolute bottom-3 left-4 text-quieter">{label}</span>
-          <span className="type-label-sm absolute bottom-3 right-4 text-quieter">{index}</span>
+          {/* These sit in the lower quarter of the figure, which is exactly
+              where the seabed renders. White on sunlit sand measures 1.69:1,
+              so each label carries its own flat chip rather than the sand being
+              darkened until it stops looking like sand. */}
+          <span className="type-label-sm absolute bottom-3 left-3 bg-black/85 px-2 py-1 text-white">
+            {label}
+          </span>
+          <span className="type-label-sm absolute bottom-3 right-3 bg-black/85 px-2 py-1 text-white">
+            {index}
+          </span>
         </>
       )}
     </div>

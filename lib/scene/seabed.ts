@@ -46,26 +46,30 @@ const FRAG = /* glsl */ `
   }
 
   void main() {
-    // perspective: the floor recedes, so compress detail toward the horizon
-    float depth = pow(vUv.y, 1.9);
+    // The plane's BOTTOM edge is the floor nearest the viewer and its top edge
+    // is the far horizon -- so nearness runs opposite to vUv.y. Getting this
+    // backwards hazes out the near sand and leaves a gap above the sill.
+    float near = 1.0 - vUv.y;
+
     vec2 p = vec2(vUv.x * 9.0, vUv.y * 3.2);
 
-    // ripple bands -- wavelength varies so they do not read as corduroy
+    // ripple bands -- wavelength varies so they do not read as corduroy, and
+    // they coarsen toward the viewer where the floor is closest
     float ripple = sin(p.y * 26.0 + noise(p * 1.4) * 5.0) * 0.5 + 0.5;
-    ripple = pow(ripple, 1.8) * (0.10 + 0.16 * depth);
+    ripple = pow(ripple, 1.8) * (0.10 + 0.18 * near);
 
-    // grain
     float grain = noise(vUv * 420.0) * 0.055;
 
     vec3 sand = mix(uShadow, uSand, 0.45 + ripple + grain);
 
-    // the surface net, playing over the floor
-    float c = caustic(vec2(vUv.x * 7.0, vUv.y * 3.0), uTime) * depth;
+    // the surface net, strongest on the near floor where the light reaches
+    float c = caustic(vec2(vUv.x * 7.0, vUv.y * 3.0), uTime) * (0.35 + 0.65 * near);
     sand = mix(sand, uLight, clamp(c * 0.55, 0.0, 1.0));
 
-    // haze toward the horizon: water between the eye and the far floor
-    float haze = smoothstep(0.55, 0.0, vUv.y);
-    gl_FragColor = vec4(sand, 1.0 - haze * 0.85);
+    // Water between the eye and the FAR floor: haze belongs at the horizon.
+    // The near edge stays fully opaque so the sand meets the sill with no gap.
+    float haze = smoothstep(0.42, 1.0, vUv.y);
+    gl_FragColor = vec4(sand, 1.0 - haze * 0.9);
   }
 `;
 
@@ -93,8 +97,11 @@ export function createSeabed(sand: Color, shadow: Color, light: Color): Seabed {
   // Sits low in the frame, behind the school. Kept below roughly the lower
   // quarter so the floor reads as distance underneath the copy rather than as
   // a band cutting through it.
-  mesh.position.set(0, -2.62, -2.2);
-  mesh.scale.set(6, 1.25, 1);
+  // The near edge is deliberately pushed below the camera's bottom so the
+  // scissor at the sill is what cuts the sand off, never the geometry running
+  // out. Anything else leaves a strip of water between sand and sill.
+  mesh.position.set(0, -2.35, -2.2);
+  mesh.scale.set(6, 1.9, 1);
 
   return {
     mesh,
