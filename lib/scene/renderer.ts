@@ -58,9 +58,11 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
 
   function syncOcean() {
     underwater = oceanRoute && oceanInView;
-    // ground-sea retires the accent to white; the figure drawn over it has to
-    // follow, or the one orange object on the page is the 3D one.
-    aperture.setColor(underwater ? p.bone : p.ember);
+    // The iris keeps the accent everywhere, underwater included. It is a
+    // decorative figure rather than text, so the AA rules that forced the
+    // chapter's TYPE to white do not bind it -- and against the darkened
+    // surface stop the ember reads as the one warm object in cold water.
+    aperture.setColor(p.ember);
   }
   syncOcean();
 
