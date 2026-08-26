@@ -14,7 +14,7 @@ import { Stagger, StaggerItem, Reveal } from "@/components/motion/Reveal";
  */
 export function WhyChooseSection() {
   return (
-    <section className="ground-ink-2 relative py-24 md:py-36">
+    <section className="ground-ink relative py-24 md:py-36">
       <div className="shell">
         <div className="rule-b flex flex-col gap-6 pb-10 md:flex-row md:items-end md:justify-between">
           <div>

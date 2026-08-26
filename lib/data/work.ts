@@ -44,7 +44,7 @@ export const workItems: WorkItem[] = [
       "A weekly rhythm the owner can sustain after the engagement ends",
     ],
     figure: "horizon",
-    tone: "ink",
+    tone: "ember",
   },
   {
     slug: "independent-service-business",
@@ -74,7 +74,7 @@ export const workItems: WorkItem[] = [
       "A short-form format the founder can repeat weekly without a studio",
     ],
     figure: "orbit",
-    tone: "ink",
+    tone: "ember",
   },
 ];
 

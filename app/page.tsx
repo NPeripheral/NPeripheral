@@ -36,21 +36,26 @@ export const metadata = {
 };
 
 /**
- * The homepage is sequenced as chapters, and the ground alternates so no two
- * neighbouring sections share a composition or a colour:
+ * The homepage is sequenced as chapters. The ground changes at a few
+ * deliberate seams — cream for the two moments meant to feel like a break,
+ * ember for the two brand-voice beats — but most of the run is ink.
+ * Services through why-us is seven chapters straight on ink; composition,
+ * not colour, differentiates them (a ruled list, a pinned wipe, a pinned
+ * horizontal run, a ruled set of advantages), and cream lands harder at
+ * pricing for the wait:
  *
  *   00 hero           ink      thirds, figure right
  *      ticker         ember    horizontal motion
  *   01 premise        cream    single centred column
  *   02 services       ink      ruled list, cursor-tracked panel
- *   03 where you are  ink-2    three states + figure
+ *   03 where you are  ink      three states + figure
  *   04 before/after   ink→cream  pinned wipe
- *   05 our work       cream    concept projects, badged
+ *   05 our work       ink      concept projects, badged
  *   06 process        ink      pinned horizontal run
- *   07 getting started ember   the invitation, in place of testimonials
- *   08 why us         ink-2    ruled advantages
+ *   07 getting started ink     the invitation, in place of testimonials
+ *   08 why us         ink      ruled advantages
  *   09 pricing        cream    quote factors
- *   10 questions      cream→   sticky heading + accordion
+ *   10 questions      ink      sticky heading + accordion
  *      statement      ember    full-bleed motto
  *   11 close          ink      thirds, mirrors the hero
  *

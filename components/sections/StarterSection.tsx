@@ -31,7 +31,7 @@ const starts = [
  */
 export function StarterSection() {
   return (
-    <section className="ground-ink-2 relative py-24 md:py-32">
+    <section className="ground-ink relative py-24 md:py-32">
       <div className="shell">
         <div className="rule-b flex flex-col gap-6 pb-10 lg:flex-row lg:items-end lg:justify-between">
           <div>

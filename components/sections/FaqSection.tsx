@@ -12,7 +12,7 @@ import { Lines } from "@/components/motion/Lines";
  */
 export function FaqSection() {
   return (
-    <section id="faq" className="ground-cream relative py-24 md:py-36">
+    <section id="faq" className="ground-ink relative py-24 md:py-36">
       <div className="shell grid gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-4">
           <div className="lg:sticky lg:top-28">

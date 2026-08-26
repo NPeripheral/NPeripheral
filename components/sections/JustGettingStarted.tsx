@@ -32,7 +32,7 @@ const offers = [
  */
 export function JustGettingStarted() {
   return (
-    <section className="ground-ember relative py-24 md:py-32">
+    <section className="ground-ink relative py-24 md:py-32">
       <div className="shell">
         <div className="rule-b flex items-baseline gap-4 pb-3">
           <span className="type-label-sm">07</span>
