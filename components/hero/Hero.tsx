@@ -4,8 +4,8 @@ import { useRef } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { Button, ArrowRight } from "@/components/ui/Button";
 import { Lines } from "@/components/motion/Lines";
-import { Aperture } from "@/components/visual/Aperture";
 import { siteConfig } from "@/lib/site-config";
+import { SceneSlot } from "@/components/scene/SceneSlot";
 
 /**
  * Chapter 00.
@@ -121,12 +121,8 @@ export function Hero() {
               transition={{ duration: 1.3, delay: 0.55, ease: [0.76, 0, 0.24, 1] }}
               style={{ willChange: "transform" }}
             >
-              <Aperture
-                figure="lens"
+              <SceneSlot
                 tone="ink"
-                anchor="center"
-                dot={4}
-                interactive
                 label="Field of view"
                 index="Fig. 01"
                 className="h-[34vh] w-full border border-[var(--color-line)] sm:h-[40vh] lg:h-[62vh]"

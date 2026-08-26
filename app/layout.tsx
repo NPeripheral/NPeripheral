@@ -13,6 +13,7 @@ import { PreloaderMount } from "@/components/motion/PreloaderMount";
 import { StickyMobileCta } from "@/components/ui/StickyMobileCta";
 import { CommandPalette } from "@/components/ui/CommandPalette";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { SceneCanvas } from "@/components/scene/SceneCanvas";
 
 /* Voice: an editorial serif with real italics. */
 const fraunces = Fraunces({
@@ -193,6 +194,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
         <PreloaderMount />
         <SmoothScroll />
+        <SceneCanvas />
         <ScrollProgress />
         <CustomCursor />
 

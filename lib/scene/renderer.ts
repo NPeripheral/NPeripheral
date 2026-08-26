@@ -1,0 +1,144 @@
+import { OrthographicCamera, Scene, WebGLRenderer } from "three";
+import { CHAPTERS, type ChapterName, type ChapterState } from "./chapters";
+import { createAperture } from "./aperture";
+import { createLeaves } from "./leaves";
+import { palette } from "./palette";
+
+export interface SceneHandle {
+  setChapter: (name: ChapterName) => void;
+  /** Screen-space rect the aperture should occupy, from a SceneSlot. */
+  setSlot: (rect: DOMRect | null) => void;
+  resize: () => void;
+  destroy: () => void;
+}
+
+export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
+  const gl = canvas.getContext("webgl2", { alpha: true, antialias: true });
+  if (!gl) return null;
+
+  let renderer: WebGLRenderer;
+  try {
+    renderer = new WebGLRenderer({ canvas, context: gl, alpha: true, antialias: true });
+  } catch {
+    return null;
+  }
+  renderer.setClearAlpha(0);
+
+  const scene = new Scene();
+  const camera = new OrthographicCamera(-3, 3, 3, -3, 0.1, 100);
+  camera.position.z = 5;
+
+  const p = palette();
+  const aperture = createAperture(p.ember);
+  const leaves = createLeaves(p.ink4, p.ember);
+  scene.add(aperture.group, leaves.mesh);
+
+  let target: ChapterState = { ...CHAPTERS.home };
+  const current: ChapterState = { ...CHAPTERS.home };
+  let slot: DOMRect | null = null;
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let raf = 0;
+  let last = performance.now();
+  let t = 0;
+  let visible = true;
+  let running = false;
+  let destroyed = false;
+
+  function sizeToViewport() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    renderer.setPixelRatio(dpr);
+    renderer.setSize(w, h, false);
+    const aspect = w / h;
+    camera.left = -3 * aspect;
+    camera.right = 3 * aspect;
+    camera.updateProjectionMatrix();
+  }
+
+  function placeAperture() {
+    if (!slot) {
+      aperture.group.visible = false;
+      return;
+    }
+    aperture.group.visible = true;
+    // Map the slot's screen rect into world space so the aperture sits exactly
+    // inside the figure box the page already reserves. The canvas is a figure,
+    // not a background: over an opaque ground a background canvas is invisible.
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const cx = slot.left + slot.width / 2;
+    const cy = slot.top + slot.height / 2;
+    const aspect = w / h;
+    aperture.group.position.x = ((cx / w) * 2 - 1) * 3 * aspect;
+    aperture.group.position.y = -((cy / h) * 2 - 1) * 3;
+    const fit = Math.min(slot.width / w, slot.height / h) * 3.4;
+    aperture.group.scale.setScalar(Math.max(fit, 0.2));
+  }
+
+  function frame(now: number) {
+    if (destroyed) return;
+    if (!visible) { running = false; return; }
+    const dt = Math.min((now - last) / 1000, 1 / 30);
+    last = now;
+    t += dt;
+
+    // Lerp toward the target chapter — the same object re-forming.
+    const k = reduced ? 1 : 1 - Math.exp(-dt * 3);
+    current.openness += (target.openness - current.openness) * k;
+    current.separation += (target.separation - current.separation) * k;
+    current.distance += (target.distance - current.distance) * k;
+    current.spin += (target.spin - current.spin) * k;
+
+    aperture.apply(current, reduced ? 0 : t);
+    if (!reduced) leaves.update(dt);
+    placeAperture();
+    renderer.render(scene, camera);
+    raf = requestAnimationFrame(frame);
+  }
+
+  function start() {
+    if (destroyed || running || !visible) return;
+    running = true;
+    last = performance.now();
+    raf = requestAnimationFrame(frame);
+  }
+
+  sizeToViewport();
+  placeAperture();
+  if (reduced) {
+    // Reduced motion: render one still frame and stop. No drift, no spin, no gust.
+    aperture.apply(current, 0);
+    renderer.render(scene, camera);
+  } else {
+    start();
+  }
+
+  const onVisibility = () => {
+    visible = !document.hidden;
+    if (visible) start();
+  };
+  document.addEventListener("visibilitychange", onVisibility);
+  const onResize = () => { sizeToViewport(); start(); };
+  window.addEventListener("resize", onResize);
+
+  return {
+    setChapter(name) {
+      target = { ...CHAPTERS[name] };
+      if (!reduced) { leaves.burst(); start(); }
+    },
+    setSlot(rect) { slot = rect; if (!reduced) start(); else { placeAperture(); renderer.render(scene, camera); } },
+    resize() { sizeToViewport(); start(); },
+    destroy() {
+      destroyed = true;
+      cancelAnimationFrame(raf);
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("resize", onResize);
+      aperture.dispose();
+      leaves.dispose();
+      renderer.dispose();
+    },
+  };
+}
