@@ -47,12 +47,21 @@ export interface Leaves {
   mesh: InstancedMesh;
   update: (dt: number) => void;
   burst: () => void;
+  /**
+   * Retune for the ground currently behind them. The spec calls for ink-4 on
+   * ink and cream-3 on cream: a single colour makes them near-invisible on one
+   * ground and dark scratches on the other, and scratches read as debris rather
+   * than as leaves.
+   */
+  setGround: (base: Color, accent: Color) => void;
   dispose: () => void;
 }
 
 export function createLeaves(base: Color, accent: Color): Leaves {
   const geometry = new ShapeGeometry(vesica(), 8);
-  const material = new MeshBasicMaterial({ transparent: true, opacity: 0.85 });
+  // Legible because they MOVE, not because they are bright. At rest they are
+  // barely separated from the ground; the gust is what makes them register.
+  const material = new MeshBasicMaterial({ transparent: true, opacity: 0.42 });
   const mesh = new InstancedMesh(geometry, material, COUNT);
   const dummy = new Object3D();
 
@@ -116,12 +125,20 @@ export function createLeaves(base: Color, accent: Color): Leaves {
     for (const l of leaves) l.gust = 1;
   }
 
+  function setGround(nextBase: Color, nextAccent: Color) {
+    for (let idx = 0; idx < COUNT; idx++) {
+      mesh.setColorAt(idx, idx === COUNT - 1 ? nextAccent : nextBase);
+    }
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }
+
   update(0);
 
   return {
     mesh,
     update,
     burst,
+    setGround,
     dispose() {
       geometry.dispose();
       material.dispose();

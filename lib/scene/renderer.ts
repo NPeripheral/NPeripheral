@@ -20,6 +20,8 @@ export interface SceneHandle {
    * below the hero; the ocean has to end where the hero does.
    */
   setOceanGate: (el: HTMLElement | null) => void;
+  /** Which ground-* chapter is currently behind the canvas. */
+  setGround: (name: string) => void;
   resize: () => void;
   destroy: () => void;
 }
@@ -215,6 +217,12 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
       if (!oceanRoute) oceanInView = false;
       syncOcean();
       if (!reduced) { leaves.burst(); start(); }
+      else { placeAperture(); draw(); }
+    },
+    setGround(name) {
+      const onLight = name === "ground-cream" || name === "ground-ember";
+      leaves.setGround(onLight ? p.cream3 : p.ink4, p.ember);
+      if (!reduced) start();
       else { placeAperture(); draw(); }
     },
     setOceanGate(el) {
