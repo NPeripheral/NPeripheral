@@ -67,6 +67,27 @@
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
 
+  /* --- Cascade: the Persona 5 entrance, used in the seams only ----------
+     --ease-snap overshoots ~8%. --ease-premium is expo-out and mathematically
+     cannot overshoot, which is why this curve is new rather than reused.
+     Overshoot is applied to transform ONLY; opacity clamps at 1 and a back
+     curve on it produces a dead flat spot. */
+  --ease-snap: cubic-bezier(0.2, 1.4, 0.4, 1);
+  --cascade-step: 45ms;
+  --cascade-dur: 420ms;
+
+  /* Travel is 22px along the 6.5° cut axis: (cos 6.5°, sin 6.5°) × 22.
+     Cascade and cuts sharing one axis is what makes the system read as
+     authored rather than assembled. */
+  --cascade-x: 21.86px;
+  --cascade-y: 2.49px;
+
+  /* --- Diagonal cuts ----------------------------------------------------
+     6.5° is derived, not chosen: the 1344px shell gives 416px columns and
+     48px gutters, and atan(48/416) = 6.58°. Expressing the rise in vw keeps
+     the angle constant at every breakpoint. */
+  --cut-rise: 11.5vw;
+
   /* --- Radii: nearly none. Editorial pages have corners.
      The whole scale is flattened so that any legacy `rounded-*` class in the
      codebase resolves to a hairline radius rather than a soft SaaS pill.
