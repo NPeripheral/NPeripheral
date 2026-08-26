@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import { services } from "@/lib/data/services";
 import { Aperture, type ApertureFigure } from "@/components/visual/Aperture";
-import { Reveal } from "@/components/motion/Reveal";
+import { Cascade, CascadeItem, Reveal } from "@/components/motion/Reveal";
 import { Lines } from "@/components/motion/Lines";
 import { ArrowRight } from "@/components/ui/Button";
 import { DiagonalCut } from "@/components/motion/DiagonalCut";
@@ -102,11 +102,12 @@ export function ServicesSection() {
             </motion.div>
           ) : null}
 
+        <Cascade>
           <ul onPointerLeave={() => setActive(null)}>
             {services.map((service, i) => {
               const isActive = active === i;
               return (
-                <li key={service.slug}>
+                <CascadeItem as="li" key={service.slug}>
                   <Link
                     href="/contact"
                     data-cursor="view"
@@ -173,10 +174,11 @@ export function ServicesSection() {
                       </span>
                     </div>
                   </Link>
-                </li>
+                </CascadeItem>
               );
             })}
           </ul>
+        </Cascade>
         </div>
       </div>
     </section>
