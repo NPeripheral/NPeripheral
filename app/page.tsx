@@ -6,7 +6,7 @@ import { ServicesSection } from "@/components/sections/ServicesSection";
 import { StarterSection } from "@/components/sections/StarterSection";
 import { DiptychSection } from "@/components/sections/DiptychSection";
 import { WorkSection } from "@/components/sections/WorkSection";
-import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
+import { PlanBlueprint } from "@/components/sections/PlanBlueprint";
 import { JustGettingStarted } from "@/components/sections/JustGettingStarted";
 import { WhyChooseSection } from "@/components/sections/WhyChooseSection";
 import { PricingSection } from "@/components/sections/PricingSection";
@@ -77,7 +77,7 @@ export default function Home() {
       <StarterSection />
       <DiptychSection />
       <WorkSection />
-      <ProcessTimeline />
+      <PlanBlueprint />
       <JustGettingStarted />
       <WhyChooseSection />
       <PricingSection />

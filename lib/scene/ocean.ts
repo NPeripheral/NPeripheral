@@ -12,6 +12,8 @@ import {
   Shape,
   ShapeGeometry,
 } from "three";
+import { createCaustics } from "./caustics";
+import { createSeabed } from "./seabed";
 
 /**
  * The underwater scene: sunlight shafts from the surface, and fish.
@@ -55,9 +57,22 @@ export interface Ocean {
   dispose: () => void;
 }
 
-export function createOcean(light: Color, body: Color, accent: Color): Ocean {
+export function createOcean(
+  light: Color,
+  body: Color,
+  accent: Color,
+  deep: Color,
+  sand: Color,
+  sandShadow: Color,
+): Ocean {
   const group = new Group();
   const disposables: Array<{ dispose: () => void }> = [];
+
+  // Floor first, then the caustic net over it, then shafts, then the school --
+  // painted back to front so the water reads as having depth.
+  const seabed = createSeabed(sand, sandShadow, light);
+  const caustics = createCaustics(light, deep);
+  group.add(seabed.mesh, caustics.mesh);
 
   // --- sunlight shafts -----------------------------------------------------
   // Long thin planes, additive, leaning off vertical. Additive blending is what
@@ -117,6 +132,8 @@ export function createOcean(light: Color, body: Color, accent: Color): Ocean {
   group.add(bodies, tails);
 
   function update(dt: number, t: number) {
+    seabed.update(t);
+    caustics.update(t);
     for (let i = 0; i < FISH; i++) {
       const f = school[i];
       f.x += f.speed * f.dir * dt;
@@ -155,6 +172,8 @@ export function createOcean(light: Color, body: Color, accent: Color): Ocean {
     dispose() {
       bodies.dispose();
       tails.dispose();
+      seabed.dispose();
+      caustics.dispose();
       disposables.forEach((d) => d.dispose());
     },
   };

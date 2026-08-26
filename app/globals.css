@@ -42,6 +42,8 @@
   --color-sea: #4aa3c4;
   --color-sea-deep: #0d3b52;
   --color-sea-floor: #06222f;
+  --color-sand: #c9b48c;
+  --color-sand-shadow: #4a6b74;
 
   /* --- Hairlines -------------------------------------------------------- */
   --color-line: rgba(244, 239, 230, 0.14);
@@ -358,11 +360,19 @@ h4,
     var(--color-sea-deep) 58%,
     var(--color-sea-floor) 100%
   );
-  color: var(--color-bone);
-  --rule: rgba(244, 239, 230, 0.2);
-  --rule-soft: rgba(244, 239, 230, 0.1);
-  --quiet: #cfeaf4;
-  --quieter: #9fc9d8;
+  color: #fff;
+  --rule: rgba(255, 255, 255, 0.34);
+  --rule-soft: rgba(255, 255, 255, 0.16);
+  --quiet: #fff;
+  --quieter: rgba(255, 255, 255, 0.72);
+
+  /* The accent is retired in this chapter. Ember against sunlit blue reads as
+     a clash rather than an accent, so everything set in it resolves to white --
+     the same mechanism ground-cream already uses to darken ember for contrast.
+     One override here fixes every component inside the chapter; none of them
+     need to know they are underwater. */
+  --color-ember: #fff;
+  --color-ember-2: #fff;
 }
 
 @utility ground-ember {

@@ -6,6 +6,7 @@ import { Button, ArrowRight } from "@/components/ui/Button";
 import { Lines } from "@/components/motion/Lines";
 import { siteConfig } from "@/lib/site-config";
 import { SceneSlot } from "@/components/scene/SceneSlot";
+import { OceanGate } from "@/components/scene/OceanGate";
 
 /**
  * Chapter 00.
@@ -43,6 +44,7 @@ export function Hero() {
       className="ground-sea relative flex min-h-[100svh] flex-col justify-between overflow-hidden pt-28 md:pt-32"
       aria-labelledby="hero-heading"
     >
+      <OceanGate />
       <div className="shell relative z-10 grid flex-1 items-center gap-12 lg:grid-cols-12 lg:gap-10">
         <motion.div
           style={reduced ? undefined : { y: typeY }}

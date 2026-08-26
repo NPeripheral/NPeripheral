@@ -21,7 +21,11 @@ export function Navbar() {
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const { scrollY } = useScroll();
+
   const pathname = usePathname();
+
+  /** True only at the top of the landing page, where the ground is sea. */
+  const overSea = pathname === "/" && !scrolled;
   const lastY = useRef(0);
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -80,7 +84,10 @@ export function Navbar() {
                   href={link.href}
                   className="type-label group/nav relative inline-flex items-center gap-2 py-2 text-bone/70 transition-colors duration-300 hover:text-bone"
                 >
-                  <span className="text-[9px] text-ember opacity-0 transition-opacity duration-300 group-hover/nav:opacity-100">
+                  <span className={cn(
+                    "text-[9px] opacity-0 transition-opacity duration-300 group-hover/nav:opacity-100",
+                    overSea ? "text-white" : "text-ember",
+                  )}>
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <span className="link-underline">{link.label}</span>
@@ -92,7 +99,16 @@ export function Navbar() {
           <div className="hidden items-center gap-3 lg:flex">
             <CommandPaletteHint />
             <ContextualHelp />
-            <Button href="/contact" size="sm" trailingIcon={<ArrowRight />}>
+            {/* Over the underwater hero the accent is retired, matching the
+                ground-sea override inside the chapter -- an ember pill against
+                sunlit blue reads as a clash, not an accent. Once the page has
+                scrolled onto ink the primary button returns. */}
+            <Button
+              href="/contact"
+              size="sm"
+              variant={overSea ? "secondary" : "primary"}
+              trailingIcon={<ArrowRight />}
+            >
               Get a Quote
             </Button>
           </div>

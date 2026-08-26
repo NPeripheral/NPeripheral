@@ -58,6 +58,8 @@ function bladeShape(): Shape {
 export interface Aperture {
   group: Group;
   apply: (s: ChapterState, t: number) => void;
+  /** The accent is retired underwater, so the figure has to follow. */
+  setColor: (c: Color) => void;
   dispose: () => void;
 }
 
@@ -112,6 +114,10 @@ export function createAperture(color: Color): Aperture {
   return {
     group,
     apply,
+    setColor(c) {
+      material.color.copy(c);
+      edgeMaterial.color.copy(c);
+    },
     dispose() {
       geometry.dispose();
       edges.dispose();

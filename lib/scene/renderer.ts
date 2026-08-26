@@ -14,6 +14,12 @@ export interface SceneHandle {
    * wrong within a frame of being taken.
    */
   setSlot: (el: HTMLElement | null) => void;
+  /**
+   * The element whose visibility gates the underwater scene. The canvas is
+   * fixed, so route-gating alone left the school swimming over every section
+   * below the hero; the ocean has to end where the hero does.
+   */
+  setOceanGate: (el: HTMLElement | null) => void;
   resize: () => void;
   destroy: () => void;
 }
@@ -37,18 +43,26 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
   const p = palette();
   const aperture = createAperture(p.ember);
   const leaves = createLeaves(p.ink4, p.ember);
-  const ocean = createOcean(p.seaLight, p.sea, p.ember);
+  const ocean = createOcean(p.seaLight, p.sea, p.bone, p.seaDeep, p.sand, p.sandShadow);
   scene.add(aperture.group, leaves.mesh, ocean.group);
 
   // The ocean is the landing chapter only. Everywhere else the scene returns to
   // the ink/ember register the rest of the site is built in.
   let underwater = false;
-  function setUnderwater(on: boolean) {
-    underwater = on;
-    ocean.group.visible = on;
-    leaves.mesh.visible = !on;
+  let oceanRoute = false;
+  let oceanInView = false;
+  let gateObserver: IntersectionObserver | null = null;
+
+  function syncOcean() {
+    underwater = oceanRoute && oceanInView;
+    ocean.group.visible = underwater;
+    // Below the hero the site returns to what it was: leaves, not fish.
+    leaves.mesh.visible = !underwater;
+    // ground-sea retires the accent to white; the figure drawn over it has to
+    // follow, or the one orange object on the page is the 3D one.
+    aperture.setColor(underwater ? p.bone : p.ember);
   }
-  setUnderwater(false);
+  syncOcean();
 
   let target: ChapterState = { ...CHAPTERS.home };
   const current: ChapterState = { ...CHAPTERS.home };
@@ -152,9 +166,26 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
   return {
     setChapter(name) {
       target = { ...CHAPTERS[name] };
-      setUnderwater(name === "home");
+      oceanRoute = name === "home";
+      if (!oceanRoute) oceanInView = false;
+      syncOcean();
       if (!reduced) { leaves.burst(); start(); }
       else { placeAperture(); renderer.render(scene, camera); }
+    },
+    setOceanGate(el) {
+      gateObserver?.disconnect();
+      gateObserver = null;
+      if (!el) { oceanInView = false; syncOcean(); return; }
+      gateObserver = new IntersectionObserver(
+        (entries) => {
+          oceanInView = entries[entries.length - 1]?.isIntersecting ?? false;
+          syncOcean();
+          if (!reduced) start();
+          else { placeAperture(); renderer.render(scene, camera); }
+        },
+        { threshold: 0 },
+      );
+      gateObserver.observe(el);
     },
     setSlot(el) { slotEl = el; if (!reduced) start(); else { placeAperture(); renderer.render(scene, camera); } },
     resize() { sizeToViewport(); start(); },
@@ -163,6 +194,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
       cancelAnimationFrame(raf);
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("resize", onResize);
+      gateObserver?.disconnect();
       aperture.dispose();
       leaves.dispose();
       ocean.dispose();
