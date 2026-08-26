@@ -348,6 +348,27 @@ h4,
   --quieter: rgba(255, 246, 241, 0.6);
 }
 
+/* A chapter boundary that rakes 6.5° instead of sitting flat.
+
+   The section pulls up by one rise and clips its own top corner away, so the
+   PREVIOUS chapter's ground shows through the notch. That is why this only
+   works where the ground actually changes — over a matching ground it is
+   invisible, which is the intended constraint, not a limitation. */
+@utility cut-top {
+  margin-top: calc(-1 * var(--cut-rise));
+  clip-path: polygon(0 0, 100% var(--cut-rise), 100% 100%, 0 100%);
+  padding-top: var(--cut-rise);
+}
+
+/* Reversed rake. Used exactly once, at DiptychSection, where the meaning
+   itself reverses. A second use makes it variety; one use makes it an
+   argument. */
+@utility cut-top-reverse {
+  margin-top: calc(-1 * var(--cut-rise));
+  clip-path: polygon(0 var(--cut-rise), 100% 0, 100% 100%, 0 100%);
+  padding-top: var(--cut-rise);
+}
+
 @utility rule-t {
   border-top: 1px solid var(--rule, var(--color-line));
 }
