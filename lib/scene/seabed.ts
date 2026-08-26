@@ -60,7 +60,10 @@ const FRAG = /* glsl */ `
 
     float grain = noise(vUv * 420.0) * 0.055;
 
-    vec3 sand = mix(uShadow, uSand, 0.45 + ripple + grain);
+    // The blend leaned too far toward the shadow tone, which read as more blue
+    // water rather than as a floor. Sand carries the mix; the shadow only sits
+    // in the ripple troughs, and more of it is exposed near the viewer.
+    vec3 sand = mix(uShadow, uSand, clamp(0.58 + 0.22 * near + ripple + grain, 0.0, 1.0));
 
     // the surface net, strongest on the near floor where the light reaches
     float c = caustic(vec2(vUv.x * 7.0, vUv.y * 3.0), uTime) * (0.35 + 0.65 * near);
@@ -68,8 +71,8 @@ const FRAG = /* glsl */ `
 
     // Water between the eye and the FAR floor: haze belongs at the horizon.
     // The near edge stays fully opaque so the sand meets the sill with no gap.
-    float haze = smoothstep(0.42, 1.0, vUv.y);
-    gl_FragColor = vec4(sand, 1.0 - haze * 0.9);
+    float haze = smoothstep(0.55, 1.0, vUv.y);
+    gl_FragColor = vec4(sand, 1.0 - haze * 0.82);
   }
 `;
 
@@ -100,8 +103,13 @@ export function createSeabed(sand: Color, shadow: Color, light: Color): Seabed {
   // The near edge is deliberately pushed below the camera's bottom so the
   // scissor at the sill is what cuts the sand off, never the geometry running
   // out. Anything else leaves a strip of water between sand and sill.
-  mesh.position.set(0, -2.35, -2.2);
-  mesh.scale.set(6, 1.9, 1);
+  // Geometry placement matters as much as the shader here. The camera's world
+  // range is +/-3, so only the slice from -3 upward is ever on screen; if the
+  // plane's near (opaque) edge sits below that, the entire VISIBLE slice is the
+  // hazed far end and the sand renders at ~10% alpha -- present, but invisible.
+  // Near edge just past the camera bottom, far edge at -0.6.
+  mesh.position.set(0, -1.9, -2.2);
+  mesh.scale.set(6, 1.3, 1);
 
   return {
     mesh,
