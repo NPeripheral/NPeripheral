@@ -52,12 +52,10 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
   let oceanRoute = false;
   let oceanInView = false;
   let gateObserver: IntersectionObserver | null = null;
+  let gateEl: HTMLElement | null = null;
 
   function syncOcean() {
     underwater = oceanRoute && oceanInView;
-    ocean.group.visible = underwater;
-    // Below the hero the site returns to what it was: leaves, not fish.
-    leaves.mesh.visible = !underwater;
     // ground-sea retires the accent to white; the figure drawn over it has to
     // follow, or the one orange object on the page is the 3D one.
     aperture.setColor(underwater ? p.bone : p.ember);
@@ -114,6 +112,53 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
     aperture.group.scale.setScalar(Math.max(fit, 0.2));
   }
 
+  /**
+   * The water has a surface line: the black sill at the bottom of the hero.
+   * Visibility alone cannot express that -- it is on or off for the whole
+   * canvas -- so the ocean is drawn in its own pass with the WebGL scissor set
+   * to the gate rect. Sand and school are cut off exactly at the sill's top
+   * edge, and the pass above it is unclipped.
+   */
+  function applyOceanScissor(): boolean {
+    if (!gateEl) return false;
+    const r = gateEl.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1 || r.bottom <= 0 || r.top >= window.innerHeight) return false;
+    const dpr = renderer.getPixelRatio();
+    const top = Math.max(r.top, 0);
+    const bottom = Math.min(r.bottom, window.innerHeight);
+    const h = bottom - top;
+    if (h <= 0) return false;
+    renderer.setScissor(
+      Math.round(Math.max(r.left, 0) * dpr),
+      Math.round((window.innerHeight - bottom) * dpr),
+      Math.round(Math.min(r.width, window.innerWidth) * dpr),
+      Math.round(h * dpr),
+    );
+    renderer.setScissorTest(true);
+    return true;
+  }
+
+  function draw() {
+    renderer.autoClear = false;
+    renderer.clear();
+
+    // pass 1 -- the ocean, clipped to the water line
+    if (underwater && applyOceanScissor()) {
+      ocean.group.visible = true;
+      leaves.mesh.visible = false;
+      const hadAperture = aperture.group.visible;
+      aperture.group.visible = false;
+      renderer.render(scene, camera);
+      aperture.group.visible = hadAperture;
+    }
+
+    // pass 2 -- everything else, unclipped
+    renderer.setScissorTest(false);
+    ocean.group.visible = false;
+    leaves.mesh.visible = !underwater;
+    renderer.render(scene, camera);
+  }
+
   function frame(now: number) {
     if (destroyed) return;
     if (!visible) { running = false; return; }
@@ -134,7 +179,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
       else leaves.update(dt);
     }
     placeAperture();
-    renderer.render(scene, camera);
+    draw();
     raf = requestAnimationFrame(frame);
   }
 
@@ -150,7 +195,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
   if (reduced) {
     // Reduced motion: render one still frame and stop. No drift, no spin, no gust.
     aperture.apply(current, 0);
-    renderer.render(scene, camera);
+    draw();
   } else {
     start();
   }
@@ -170,24 +215,25 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
       if (!oceanRoute) oceanInView = false;
       syncOcean();
       if (!reduced) { leaves.burst(); start(); }
-      else { placeAperture(); renderer.render(scene, camera); }
+      else { placeAperture(); draw(); }
     },
     setOceanGate(el) {
       gateObserver?.disconnect();
       gateObserver = null;
+      gateEl = el;
       if (!el) { oceanInView = false; syncOcean(); return; }
       gateObserver = new IntersectionObserver(
         (entries) => {
           oceanInView = entries[entries.length - 1]?.isIntersecting ?? false;
           syncOcean();
           if (!reduced) start();
-          else { placeAperture(); renderer.render(scene, camera); }
+          else { placeAperture(); draw(); }
         },
         { threshold: 0 },
       );
       gateObserver.observe(el);
     },
-    setSlot(el) { slotEl = el; if (!reduced) start(); else { placeAperture(); renderer.render(scene, camera); } },
+    setSlot(el) { slotEl = el; if (!reduced) start(); else { placeAperture(); draw(); } },
     resize() { sizeToViewport(); start(); },
     destroy() {
       destroyed = true;

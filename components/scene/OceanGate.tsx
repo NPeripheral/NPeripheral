@@ -38,5 +38,13 @@ export function OceanGate() {
     };
   }, []);
 
-  return <div ref={ref} aria-hidden className="pointer-events-none absolute inset-0" />;
+  // Spans from the top of the section down to the sill, not the whole hero:
+  // this rect IS the water, and the renderer scissors the ocean to it.
+  return (
+    <div
+      ref={ref}
+      aria-hidden
+      className="pointer-events-none absolute inset-x-0 top-0 bottom-0"
+    />
+  );
 }

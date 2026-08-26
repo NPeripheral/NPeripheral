@@ -34,6 +34,10 @@
   --color-ember-2: #f0894b;
   --color-ember-ink: #8f2f13;
 
+  /* Foreground for anything filled with the accent. A ground that retunes
+     --color-ember must retune this with it or the fill and its label collide. */
+  --on-ember: #fff6f1;
+
   /* --- Underwater: the landing scene ------------------------------------
      A separate register from the ink/ember system on purpose -- this is the
      one chapter that leaves the warm ground. Sunlit shallows: a light shaft
@@ -373,6 +377,8 @@ h4,
      need to know they are underwater. */
   --color-ember: #fff;
   --color-ember-2: #fff;
+  /* the accent is white here, so its label has to be dark */
+  --on-ember: var(--color-ink);
 }
 
 @utility ground-ember {

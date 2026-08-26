@@ -29,6 +29,7 @@ const marks = [
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
+  const sillRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -44,8 +45,9 @@ export function Hero() {
       className="ground-sea relative flex min-h-[100svh] flex-col justify-between overflow-hidden pt-28 md:pt-32"
       aria-labelledby="hero-heading"
     >
-      <OceanGate />
-      <div className="shell relative z-10 grid flex-1 items-center gap-12 lg:grid-cols-12 lg:gap-10">
+      <div className="relative flex flex-1 flex-col">
+        <OceanGate />
+        <div className="shell relative z-10 grid flex-1 items-center gap-12 lg:grid-cols-12 lg:gap-10">
         <motion.div
           style={reduced ? undefined : { y: typeY }}
           className="lg:col-span-7 lg:pr-10 xl:col-span-6"
@@ -143,10 +145,19 @@ export function Hero() {
             </motion.div>
           </div>
         </motion.div>
+        </div>
       </div>
 
-      <motion.div style={reduced ? undefined : { opacity: fade }} className="shell relative z-10 pb-8 pt-14">
-        <div className="rule-t flex flex-col gap-6 pt-6 sm:flex-row sm:items-end sm:justify-between">
+      <motion.div
+        ref={sillRef}
+        style={reduced ? undefined : { opacity: fade }}
+        className="relative z-10 mt-14 bg-black"
+      >
+        {/* The sill: the line the water stops at. Its own flat black ground so
+            the marks below read at full contrast instead of fighting the sand,
+            and the scene is scissored to end exactly at its top edge. */}
+        <div className="shell pb-8 pt-6">
+        <div className="flex flex-col gap-6 border-t border-white/40 pt-6 sm:flex-row sm:items-end sm:justify-between">
           <dl className="flex flex-wrap gap-x-10 gap-y-5">
             {marks.map((mark, i) => (
               <motion.div
@@ -179,6 +190,7 @@ export function Hero() {
               />
             </span>
           </motion.a>
+        </div>
         </div>
       </motion.div>
     </section>
