@@ -35,10 +35,23 @@ const FRAG = /* glsl */ `
     return fract(sin(p) * 43758.5453);
   }
 
+  /**
+   * Four-point sparkle. Concave sides, long points on the axes.
+   *
+   * Along an axis the minor coordinate is 0 so the falloff is just the major
+   * one and the point reaches full size; on the diagonal both are equal and the
+   * weighted sum grows four times as fast, so the shape pinches in hard. That
+   * asymmetry is the whole star -- no polygon, no vertices.
+   */
+  float sparkle(vec2 d, float size) {
+    vec2 a = abs(d);
+    float major = max(a.x, a.y);
+    float minor = min(a.x, a.y);
+    return smoothstep(size, 0.0, major + minor * 3.2);
+  }
+
   void main() {
-    // Grid of cells; each holds one star at a hashed offset, so the field looks
-    // scattered rather than gridded but stays perfectly stable frame to frame.
-    vec2 uv = vec2(vUv.x * uAspect, vUv.y) * 7.0;
+    vec2 uv = vec2(vUv.x * uAspect, vUv.y) * 6.0;
     vec2 cell = floor(uv);
     vec2 f = fract(uv);
 
@@ -49,34 +62,48 @@ const FRAG = /* glsl */ `
       for (int x = -1; x <= 1; x++) {
         vec2 off = vec2(float(x), float(y));
         vec2 h = hash2(cell + off);
-        // Only about a third of cells hold a star, so density reads as sky
-        // rather than as a texture.
-        if (h.x > 0.55) continue;
+        // Sparse on purpose: roughly a quarter of cells ever hold a star.
+        if (h.x > 0.26) continue;
 
-        vec2 pos = off + vec2(h.x, h.y) * 0.82 + 0.09;
-        float d = length(f - pos);
+        // Each cell runs its own slow cycle. floor() is the generation counter
+        // and fract() is the life of THIS appearance -- so when a star finishes
+        // fading it comes back in a different place, because the position hash
+        // is seeded with the generation.
+        float period = 3.4 + h.y * 4.2;
+        float t = uTime / period + h.x * 23.0;
+        float gen = floor(t);
+        float life = fract(t);
 
-        // Twinkle: each star keeps its own period and phase, so the field never
-        // pulses in unison — that synchrony is the giveaway of a fake sky.
-        float phase = h.y * 6.2831;
-        float rate = 0.6 + h.x * 2.4;
-        float tw = 0.45 + 0.55 * sin(uTime * rate + phase);
+        vec2 hp = hash2(cell + off + gen * 37.13);
+        vec2 pos = off + hp * 0.78 + 0.11;
 
-        // In cell units. At 7 cells across a 1280px viewport a cell is ~180px,
-        // so this is roughly a 5-13px star -- the previous 0.008-0.030 worked
-        // out at 1-3px, which reads as sensor noise, not as a sky.
-        float size = mix(0.028, 0.075, h.y);
-        float core = smoothstep(size, 0.0, d) * tw;
-        // a soft bloom, and a faint cross-flare on the brightest stars
-        float halo = smoothstep(size * 4.0, 0.0, d) * tw * 0.30;
-        float flare = h.y > 0.72
-          ? max(smoothstep(0.05, 0.0, abs(f.y - pos.y)) * smoothstep(0.09, 0.0, abs(f.x - pos.x)),
-                smoothstep(0.05, 0.0, abs(f.x - pos.x)) * smoothstep(0.09, 0.0, abs(f.y - pos.y))) * tw * 0.30
-          : 0.0;
+        // Envelope over one life: in, hold, out. Raised to a power so it spends
+        // most of the cycle faint and only briefly bright -- a sky that is
+        // always fully lit reads as a texture.
+        float env = pow(sin(life * 3.14159265), 1.6);
 
-        float v = core + halo + flare;
-        // One star in roughly twenty carries the accent.
-        vec3 tint = h.y > 0.95 ? uAccent : uStar;
+        // The twinkle itself, on its own period so it never syncs with the life
+        // cycle or with a neighbour.
+        float tw = 0.55 + 0.45 * sin(uTime * (2.2 + hp.x * 3.4) + hp.y * 6.2831);
+
+        float bright = env * tw;
+        if (bright <= 0.001) continue;
+
+        // Size is biased, not evenly spread. A linear mix gives a field where
+        // every star is mid-sized, which reads as one repeated object; cubing
+        // the hash pushes most values to the floor so the sky is mostly small
+        // points with the occasional large one. That ratio is what makes a
+        // starfield read as depth rather than as a pattern.
+        float grade = hp.y * hp.y * hp.y;
+        float size = mix(0.013, 0.088, grade);
+
+        float core = sparkle(f - pos, size) * bright;
+        float halo = smoothstep(size * 2.6, 0.0, length(f - pos)) * bright * 0.18;
+
+        // The big ones burn a little harder, so scale reads as proximity
+        // instead of just as a bigger sprite.
+        float v = (core + halo) * (0.85 + grade * 0.5);
+        vec3 tint = hp.x > 0.93 ? uAccent : uStar;
         col += tint * v;
         alpha += v;
       }
