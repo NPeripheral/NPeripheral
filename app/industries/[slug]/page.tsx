@@ -7,6 +7,7 @@ import { TiltCard } from "@/components/ui/TiltCard";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { siteConfig } from "@/lib/site-config";
+import { DiagonalCut } from "@/components/motion/DiagonalCut";
 
 type Params = { slug: string };
 
@@ -88,7 +89,8 @@ export default async function IndustryPage({ params }: { params: Promise<Params>
         </div>
       </section>
 
-      <section className="ground-ink py-24 md:py-32">
+      <section className="ground-ink py-24 md:py-32 cut-top">
+      <DiagonalCut />
         <div className="shell">
           <div className="rule-b flex items-baseline gap-4 pb-3">
             <span className="type-label-sm text-ember">✳</span>

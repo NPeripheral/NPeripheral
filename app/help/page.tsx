@@ -5,6 +5,7 @@ import { HelpIndex } from "@/components/help/HelpIndex";
 import { Button, ArrowRight } from "@/components/ui/Button";
 import { helpTopics } from "@/lib/data/help";
 import { siteConfig } from "@/lib/site-config";
+import { DiagonalCut } from "@/components/motion/DiagonalCut";
 
 export const metadata: Metadata = {
   title: "Help centre",
@@ -56,7 +57,8 @@ export default function HelpPage() {
         </div>
       </section>
 
-      <section className="ground-ink py-20 md:py-28">
+      <section className="ground-ink py-20 md:py-28 cut-top">
+      <DiagonalCut />
         <div className="shell grid gap-10 lg:grid-cols-12">
           <div className="lg:col-span-6">
             <div className="rule-b flex items-baseline gap-4 pb-3">

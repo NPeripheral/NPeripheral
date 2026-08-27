@@ -6,6 +6,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { Tour, type TourStep } from "@/components/tour/Tour";
 import { Aperture } from "@/components/visual/Aperture";
 import { siteConfig } from "@/lib/site-config";
+import { DiagonalCut } from "@/components/motion/DiagonalCut";
 
 export const metadata: Metadata = {
   title: "How We Work",
@@ -141,7 +142,8 @@ export default function OnboardingPage() {
         </div>
       </section>
 
-      <section className="ground-cream py-20 md:py-28">
+      <section className="ground-cream py-20 md:py-28 cut-top">
+      <DiagonalCut />
         <div className="shell">
           <ol>
             {phases.map((phase, i) => (
@@ -197,7 +199,8 @@ export default function OnboardingPage() {
       </section>
 
       {/* The refusals, given the same weight as the promises. */}
-      <section className="ground-ink-2 py-20 md:py-28" data-tour="not-promised">
+      <section className="ground-ink py-20 md:py-28 cut-top" data-tour="not-promised">
+      <DiagonalCut />
         <div className="shell grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <div className="rule-b flex items-baseline gap-4 pb-3">
