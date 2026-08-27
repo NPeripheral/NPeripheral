@@ -130,7 +130,7 @@ export function ContextualHelp({ className, variant = "icon" }: { className?: st
               <Link
                 href="/contact"
                 onClick={() => setOpen(false)}
-                className="type-label-sm link-underline text-quieter hover:text-quiet"
+                className="type-label-sm link-underline inline-block py-2 text-quieter hover:text-quiet"
               >
                 Ask a person
               </Link>

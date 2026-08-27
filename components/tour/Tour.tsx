@@ -255,7 +255,7 @@ export function Tour({ steps, storageKey, label = "Take the tour", className, au
                       <button
                         type="button"
                         onClick={finish}
-                        className="type-label-sm link-underline text-quieter"
+                        className="type-label-sm link-underline py-2 text-quieter"
                       >
                         Skip
                       </button>
@@ -269,7 +269,7 @@ export function Tour({ steps, storageKey, label = "Take the tour", className, au
                         type="button"
                         onClick={() => setIndex((i) => Math.max(0, i - 1))}
                         disabled={index === 0}
-                        className="type-label-sm text-quieter transition-colors hover:text-quiet disabled:opacity-35"
+                        className="type-label-sm py-2 text-quieter transition-colors hover:text-quiet disabled:opacity-35"
                       >
                         Back
                       </button>

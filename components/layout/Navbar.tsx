@@ -207,7 +207,7 @@ export function Navbar() {
 
                 <a
                   href={`tel:${siteConfig.phoneHref}`}
-                  className="type-label-sm link-underline text-quiet"
+                  className="type-label-sm link-underline inline-block py-2 text-quiet"
                 >
                   {siteConfig.phone}
                 </a>

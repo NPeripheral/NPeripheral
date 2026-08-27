@@ -115,7 +115,7 @@ export function HelpIndex() {
                           <a
                             key={slug}
                             href={`#${slug}`}
-                            className="link-underline text-quiet hover:text-current"
+                            className="link-underline inline-block py-2 text-quiet hover:text-current"
                           >
                             {related.title}
                           </a>
