@@ -65,8 +65,11 @@ export function PageHeader({
             ]}
           />
 
+          {/* "lift", not "rise": this paragraph is the LCP element on most
+              routes, and "rise" starts it at opacity 0 so it does not count
+              until the animation runs. Same movement, painted from frame one. */}
           {description ? (
-            <Reveal mode="rise" delay={0.35}>
+            <Reveal mode="lift" delay={0.35}>
               <p className="type-lead mt-8 max-w-xl text-quiet">{description}</p>
             </Reveal>
           ) : null}

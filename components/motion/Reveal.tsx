@@ -4,7 +4,7 @@ import { motion, useReducedMotion, type Variants } from "framer-motion";
 import type { ElementType, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type RevealMode = "rise" | "fade" | "mask" | "blur" | "slide";
+type RevealMode = "rise" | "fade" | "mask" | "blur" | "slide" | "lift";
 
 type RevealProps = {
   children: ReactNode;
@@ -38,6 +38,13 @@ function buildVariants(mode: RevealMode, duration: number, delay: number): Varia
       };
     case "slide":
       return { hidden: { opacity: 0, x: 48 }, show: { opacity: 1, x: 0, transition } };
+    case "lift":
+      // Same motion as "rise" but never transparent. An element at opacity 0 is
+      // not a Largest Contentful Paint candidate, so wrapping the biggest block
+      // of text on a page in "rise" pushes LCP out by the delay plus duration —
+      // measured at 1372ms on /work, against 156ms for the same page's header.
+      // Transform-only keeps the entrance and lets the text count when painted.
+      return { hidden: { y: 34 }, show: { y: 0, transition } };
     default:
       return { hidden: { opacity: 0, y: 34 }, show: { opacity: 1, y: 0, transition } };
   }
