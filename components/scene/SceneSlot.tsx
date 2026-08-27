@@ -1,13 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Aperture, type ApertureTone } from "@/components/visual/Aperture";
+import { Aperture, type ApertureFigure, type ApertureTone } from "@/components/visual/Aperture";
 import { getSceneHandle } from "@/lib/scene/handle";
 import type { SceneHandle } from "@/lib/scene/renderer";
 import { cn } from "@/lib/utils";
 
 type SceneSlotProps = {
   tone?: ApertureTone;
+  /** Which figure the SVG fallback draws when WebGL is unavailable. Each route
+      picks its own, and losing that variety on the fallback path would make the
+      no-WebGL site duller than the one it stands in for. */
+  figure?: ApertureFigure;
   label?: string;
   index?: string;
   className?: string;
@@ -20,7 +24,7 @@ type SceneSlotProps = {
  * unavailable the slot renders the SVG <Aperture/> that already exists, in the
  * identical box, so deleting lib/scene/ leaves a working site.
  */
-export function SceneSlot({ tone = "ink", label, index, className }: SceneSlotProps) {
+export function SceneSlot({ tone = "ink", figure = "lens", label, index, className }: SceneSlotProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [live, setLive] = useState(false);
 
@@ -62,7 +66,7 @@ export function SceneSlot({ tone = "ink", label, index, className }: SceneSlotPr
     <div ref={ref} className={cn("relative", className)}>
       {!live ? (
         <Aperture
-          figure="lens"
+          figure={figure}
           tone={tone}
           anchor="center"
           dot={4}
