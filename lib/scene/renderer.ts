@@ -58,6 +58,11 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
 
   function syncOcean() {
     underwater = oceanRoute && oceanInView;
+    // Stars and water are mutually exclusive. Underwater the sky is not
+    // visible, so a starfield over the hero reads as a bug rather than as
+    // atmosphere -- the water gets its school of fish, and the stars come back
+    // the moment the page leaves the water.
+    stars.mesh.visible = !underwater;
     // The iris keeps the accent everywhere, underwater included. It is a
     // decorative figure rather than text, so the AA rules that forced the
     // chapter's TYPE to white do not bind it -- and against the darkened
@@ -187,7 +192,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
     aperture.apply(current, reduced ? 0 : t);
     if (!reduced) {
       if (underwater) ocean.update(dt, t);
-      stars.update(t);
+      if (!underwater) stars.update(t);
     }
     placeAperture();
     draw();
