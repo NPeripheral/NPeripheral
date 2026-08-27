@@ -44,7 +44,7 @@ export function Breadcrumbs({ trail }: { trail: Crumb[] }) {
                 ) : (
                   <Link
                     href={crumb.href}
-                    className="type-label-sm link-underline text-quieter hover:text-quiet"
+                    className="inline-block py-2 type-label-sm link-underline text-quieter hover:text-quiet"
                   >
                     {crumb.label}
                   </Link>

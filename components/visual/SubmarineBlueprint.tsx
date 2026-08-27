@@ -21,9 +21,15 @@ export function SubmarineBlueprint({ className }: { className?: string }) {
 
   return (
     <div className={cn("relative w-full", className)}>
+      {/* On a phone the drawing scales to ~327px, which fits but renders its
+          station labels at about 4px -- present and unreadable. A technical
+          drawing should keep its scale and pan, the way a wide table does,
+          rather than shrink until it is decoration. The page itself never
+          scrolls sideways; only this box does. */}
+      <div className="-mx-6 overflow-x-auto px-6 sm:mx-0 sm:px-0">
       <svg
         viewBox="0 0 1200 460"
-        className="w-full"
+        className="w-full min-w-[680px]"
         role="img"
         aria-label="The four stages of the process, drawn as a submarine cutaway"
       >
@@ -151,6 +157,7 @@ export function SubmarineBlueprint({ className }: { className?: string }) {
         })}
         <line x1="986" y1="344" x2="986" y2="356" stroke="#fff" strokeWidth={CONSTRUCTION_STROKE} opacity="0.7" />
       </svg>
+      </div>
 
       {/* The stage copy, in the same two colours. Set as real text rather than
           inside the SVG so it stays selectable, translatable and responsive. */}
