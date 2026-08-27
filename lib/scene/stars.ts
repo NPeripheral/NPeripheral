@@ -38,7 +38,7 @@ const FRAG = /* glsl */ `
   void main() {
     // Grid of cells; each holds one star at a hashed offset, so the field looks
     // scattered rather than gridded but stays perfectly stable frame to frame.
-    vec2 uv = vec2(vUv.x * uAspect, vUv.y) * 13.0;
+    vec2 uv = vec2(vUv.x * uAspect, vUv.y) * 7.0;
     vec2 cell = floor(uv);
     vec2 f = fract(uv);
 
@@ -51,7 +51,7 @@ const FRAG = /* glsl */ `
         vec2 h = hash2(cell + off);
         // Only about a third of cells hold a star, so density reads as sky
         // rather than as a texture.
-        if (h.x > 0.34) continue;
+        if (h.x > 0.55) continue;
 
         vec2 pos = off + vec2(h.x, h.y) * 0.82 + 0.09;
         float d = length(f - pos);
@@ -62,11 +62,14 @@ const FRAG = /* glsl */ `
         float rate = 0.6 + h.x * 2.4;
         float tw = 0.45 + 0.55 * sin(uTime * rate + phase);
 
-        float size = mix(0.008, 0.030, h.y);
+        // In cell units. At 7 cells across a 1280px viewport a cell is ~180px,
+        // so this is roughly a 5-13px star -- the previous 0.008-0.030 worked
+        // out at 1-3px, which reads as sensor noise, not as a sky.
+        float size = mix(0.028, 0.075, h.y);
         float core = smoothstep(size, 0.0, d) * tw;
         // a soft bloom, and a faint cross-flare on the brightest stars
-        float halo = smoothstep(size * 5.0, 0.0, d) * tw * 0.22;
-        float flare = h.y > 0.86
+        float halo = smoothstep(size * 4.0, 0.0, d) * tw * 0.30;
+        float flare = h.y > 0.72
           ? max(smoothstep(0.05, 0.0, abs(f.y - pos.y)) * smoothstep(0.09, 0.0, abs(f.x - pos.x)),
                 smoothstep(0.05, 0.0, abs(f.x - pos.x)) * smoothstep(0.09, 0.0, abs(f.y - pos.y))) * tw * 0.30
           : 0.0;
@@ -103,7 +106,7 @@ export function createStars(star: Color, accent: Color): Stars {
       uAspect: { value: 1 },
       uStar: { value: star },
       uAccent: { value: accent },
-      uOpacity: { value: 0.5 },
+      uOpacity: { value: 0.9 },
     },
   });
   const mesh = new Mesh(geometry, material);

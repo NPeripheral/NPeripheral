@@ -258,7 +258,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
       // Stars belong to night. On the light chapters they fade almost out
       // rather than becoming grey specks on cream.
       const onLight = name === "ground-cream" || name === "ground-ember";
-      stars.setTone(onLight ? p.ink4 : p.bone, p.ember, onLight ? 0.12 : 0.5);
+      stars.setTone(onLight ? p.ink4 : p.bone, p.ember, onLight ? 0.16 : 0.9);
       if (!reduced) start();
       else { placeAperture(); draw(); }
     },
