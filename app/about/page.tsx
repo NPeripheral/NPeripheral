@@ -54,7 +54,7 @@ export default function AboutPage() {
               ]}
             />
 
-            <Reveal mode="rise" delay={0.15}>
+            <Reveal mode="lift" delay={0.15}>
               <p className="type-lead mt-9 max-w-xl text-quiet">{positioning.body}</p>
             </Reveal>
 

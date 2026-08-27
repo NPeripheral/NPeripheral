@@ -50,7 +50,7 @@ export default function NotFound() {
             ]}
           />
 
-          <Reveal mode="rise" delay={0.3}>
+          <Reveal mode="lift" delay={0.3}>
             <p className="type-lead mt-9 max-w-md text-quiet">
               This page moved, or it never existed. Which is ironic, given the whole
               point of what we do. Here is where you probably meant to go.

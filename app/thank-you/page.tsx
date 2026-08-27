@@ -63,7 +63,7 @@ export default function ThankYouPage() {
               ]}
             />
 
-            <Reveal mode="rise" delay={0.3}>
+            <Reveal mode="lift" delay={0.3}>
               <p className="type-lead mt-9 max-w-md text-quiet">
                 {siteConfig.responsePromise} Nothing else is required from you right now
                 — but if you would rather skip the back-and-forth, book a time directly.
