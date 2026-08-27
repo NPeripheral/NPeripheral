@@ -169,15 +169,37 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
     renderer.render(scene, camera);
   }
 
-  // ~30fps. A twinkle and a slow drift are indistinguishable from 60, and this
-  // halves every cost below at a stroke.
-  const FRAME_MS = 1000 / 30;
+  /**
+   * Adaptive frame rate.
+   *
+   * The spec asks the loop to "idle out when nothing is moving", but something
+   * always IS moving here -- stars twinkle and fish swim -- so a hard stop
+   * would freeze the scene rather than rest it. The honest version of the same
+   * intent is to spend frames only when they can be perceived.
+   *
+   * While the reader is scrolling or pointing, motion is being tracked and the
+   * scene runs at 30fps. While they are reading -- which is most of a visit --
+   * it drops to 8fps. The twinkle periods are 3.4-7.6 seconds and the envelope
+   * is a smooth sine, so 8fps is visually indistinguishable and costs a
+   * quarter as much. That is the difference between a fan spinning up while
+   * someone reads your pricing page and it not.
+   */
+  const ACTIVE_MS = 1000 / 30;
+  const IDLE_MS = 1000 / 8;
+  const ACTIVE_FOR = 1800;
   let lastDraw = 0;
+  let lastInteraction = 0;
+
+  function markActive() {
+    lastInteraction = performance.now();
+    if (!reduced) start();
+  }
 
   function frame(now: number) {
     if (destroyed) return;
     if (!visible) { running = false; return; }
-    if (now - lastDraw < FRAME_MS) { raf = requestAnimationFrame(frame); return; }
+    const budget = now - lastInteraction < ACTIVE_FOR ? ACTIVE_MS : IDLE_MS;
+    if (now - lastDraw < budget) { raf = requestAnimationFrame(frame); return; }
     lastDraw = now;
     const dt = Math.min((now - last) / 1000, 1 / 30);
     last = now;
@@ -235,6 +257,10 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
     window.addEventListener("scroll", onStillScroll, { passive: true });
   }
 
+  window.addEventListener("scroll", markActive, { passive: true });
+  window.addEventListener("pointermove", markActive, { passive: true });
+  window.addEventListener("pointerdown", markActive, { passive: true });
+
   const onVisibility = () => {
     visible = !document.hidden;
     // Guarded: without this, a reduced-motion user who switches tabs and back
@@ -290,6 +316,9 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
       cancelAnimationFrame(raf);
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("scroll", markActive);
+      window.removeEventListener("pointermove", markActive);
+      window.removeEventListener("pointerdown", markActive);
       gateObserver?.disconnect();
       cancelAnimationFrame(stillFrame);
       window.removeEventListener("scroll", onStillScroll);
