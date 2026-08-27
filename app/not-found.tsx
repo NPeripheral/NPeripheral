@@ -113,7 +113,7 @@ export default function NotFound() {
         <ul className="mt-5 flex flex-wrap gap-x-8 gap-y-3">
           {navLinks.map((link) => (
             <li key={link.label}>
-              <Link href={link.href} className="type-small link-underline text-quiet hover:text-bone">
+              <Link href={link.href} className="type-small link-underline inline-block py-1 text-quiet hover:text-bone">
                 {link.label}
               </Link>
             </li>

@@ -132,16 +132,16 @@ export default function ThankYouPage() {
           </ol>
 
           <div className="mt-12 flex flex-wrap gap-x-10 gap-y-4">
-            <a href={`mailto:${siteConfig.email}`} className="type-small link-underline">
+            <a href={`mailto:${siteConfig.email}`} className="type-small link-underline inline-block py-1">
               {siteConfig.email}
             </a>
             <a
               href={`tel:${siteConfig.phoneHref}`}
-              className="type-small link-underline"
+              className="type-small link-underline inline-block py-1"
             >
               {siteConfig.phone}
             </a>
-            <Link href="/" className="type-small link-underline text-quiet">
+            <Link href="/" className="type-small link-underline inline-block py-1 text-quiet">
               Back to the homepage
             </Link>
           </div>
