@@ -5,6 +5,7 @@ import { Lines } from "@/components/motion/Lines";
 import { Reveal } from "@/components/motion/Reveal";
 import { Aperture } from "@/components/visual/Aperture";
 import { siteConfig } from "@/lib/site-config";
+import { DiagonalCut } from "@/components/motion/DiagonalCut";
 
 export const metadata: Metadata = {
   title: "Thank you",
@@ -110,7 +111,8 @@ export default function ThankYouPage() {
         </div>
       </section>
 
-      <section className="ground-cream py-20 md:py-28">
+      <section className="ground-cream py-20 md:py-28 cut-top">
+      <DiagonalCut />
         <div className="shell">
           <div className="rule-b flex items-baseline gap-4 pb-3">
             <span className="type-label-sm text-ember">✳</span>

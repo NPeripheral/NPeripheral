@@ -2,7 +2,8 @@
 
 import { Lines } from "@/components/motion/Lines";
 import { Reveal } from "@/components/motion/Reveal";
-import { Aperture, type ApertureFigure } from "@/components/visual/Aperture";
+import { type ApertureFigure } from "@/components/visual/Aperture";
+import { SceneSlot } from "@/components/scene/SceneSlot";
 import { Breadcrumbs, type Crumb } from "@/components/layout/Breadcrumbs";
 import { cn } from "@/lib/utils";
 
@@ -72,11 +73,17 @@ export function PageHeader({
         </div>
 
         <Reveal mode="mask" delay={0.3} className="hidden lg:col-span-3 lg:col-start-10 lg:block">
-          <Aperture
-            figure={figure}
+          {/* The live aperture, not the flat SVG. PageHeader is used by all ten
+              non-home routes, so converting it here is what makes the 3D figure
+              part of the site rather than a homepage trick -- and SceneSlot
+              falls back to this exact Aperture when WebGL is unavailable, so
+              nothing is lost where it cannot run. Only one slot is mounted per
+              route (Hero renders on / alone), so they never contend. */}
+          <SceneSlot
             tone="ink"
-            anchor="center"
-            dot={4}
+            figure={figure}
+            label={eyebrow ?? "Field of view"}
+            index="Fig. 01"
             className="aspect-square w-full border border-[var(--color-line)]"
           />
         </Reveal>

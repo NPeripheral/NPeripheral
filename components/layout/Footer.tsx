@@ -17,7 +17,7 @@ function Column({ title, links }: { title: string; links: { label: string; href:
       <ul className="mt-5 flex flex-col gap-3">
         {links.map((link) => (
           <li key={link.label}>
-            <Link href={link.href} className="type-small link-underline text-quiet hover:text-bone">
+            <Link href={link.href} className="type-small link-underline inline-block py-1 text-quiet hover:text-bone">
               {link.label}
             </Link>
           </li>
@@ -70,7 +70,7 @@ export function Footer() {
                 <li>
                   <a
                     href={`tel:${siteConfig.phoneHref}`}
-                    className="type-small link-underline text-quiet hover:text-bone"
+                    className="type-small link-underline inline-block py-1 text-quiet hover:text-bone"
                   >
                     {siteConfig.phone}
                   </a>
@@ -78,7 +78,7 @@ export function Footer() {
                 <li>
                   <a
                     href={`mailto:${siteConfig.email}`}
-                    className="type-small link-underline break-all text-quiet hover:text-bone"
+                    className="type-small link-underline inline-block break-all py-1 text-quiet hover:text-bone"
                   >
                     {siteConfig.email}
                   </a>
@@ -109,7 +109,7 @@ export function Footer() {
                           href={social.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="type-small link-underline text-quiet hover:text-bone"
+                          className="type-small link-underline inline-block py-1 text-quiet hover:text-bone"
                         >
                           {social.label}
                         </a>
@@ -129,7 +129,7 @@ export function Footer() {
           <ul className="flex flex-wrap gap-6">
             {footerLinks.legal.map((link) => (
               <li key={link.label}>
-                <Link href={link.href} className="type-label-sm link-underline text-quieter hover:text-quiet">
+                <Link href={link.href} className="type-label-sm link-underline inline-block py-2 text-quieter hover:text-quiet">
                   {link.label}
                 </Link>
               </li>

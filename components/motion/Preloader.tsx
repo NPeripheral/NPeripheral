@@ -28,7 +28,17 @@ export function Preloader() {
     document.documentElement.style.overflow = "hidden";
 
     const started = performance.now();
-    const duration = 1500;
+    /**
+     * 700ms, down from 1500.
+     *
+     * This overlay covers the page, so nothing underneath can register as the
+     * largest contentful paint until it clears -- it WAS the LCP, at 1996ms on
+     * a page that is interactive in 22. A loading screen that outlasts the load
+     * by seventy times is not communicating progress, it is manufacturing a
+     * wait. The count still eases into 100 and the gesture survives; it just
+     * stops being the slowest thing on the site.
+     */
+    const duration = 700;
     let frame = 0;
     let release = 0;
 
@@ -40,7 +50,7 @@ export function Preloader() {
         frame = requestAnimationFrame(tick);
       } else {
         window.sessionStorage.setItem(LOAD_KEY, "1");
-        release = window.setTimeout(() => setActive(false), 260);
+        release = window.setTimeout(() => setActive(false), 140);
       }
     }
 

@@ -7,6 +7,7 @@ import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { Aperture } from "@/components/visual/Aperture";
 import { values, commitments, positioning } from "@/lib/data/about";
 import { siteConfig } from "@/lib/site-config";
+import { DiagonalCut } from "@/components/motion/DiagonalCut";
 
 export const metadata: Metadata = {
   title: "About",
@@ -81,7 +82,8 @@ export default function AboutPage() {
       </section>
 
       {/* How we work. */}
-      <section className="ground-ink py-24 md:py-32">
+      <section className="ground-ink py-24 md:py-32 cut-top">
+      <DiagonalCut />
         <div className="shell">
           <div className="rule-b flex items-baseline gap-4 pb-3">
             <span className="type-label-sm text-ember">✳</span>
@@ -102,7 +104,7 @@ export default function AboutPage() {
       </section>
 
       {/* Commitments — things that are true on day one. */}
-      <section className="ground-ink-2 py-24 md:py-32">
+      <section className="ground-ink py-24 md:py-32">
         <div className="shell grid gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-4">
             <div className="rule-b flex items-baseline gap-4 pb-3">

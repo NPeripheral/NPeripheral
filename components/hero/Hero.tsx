@@ -82,26 +82,35 @@ export function Hero() {
           <motion.p
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.7, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
             className="type-lead mt-7 font-display text-[1.5rem] leading-tight text-bone"
           >
             We discover buried treasure.
           </motion.p>
 
-          <motion.p
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.95, ease: [0.16, 1, 0.3, 1] }}
-            className="type-lead mt-6 max-w-md text-quiet"
-          >
+          {/*
+            Deliberately NOT animated in.
+
+            This paragraph is the page's LCP element. Wrapping it in a motion
+            entrance sets inline opacity:0 on the server-rendered markup, so the
+            browser is told to hide text it already has and cannot count it as
+            painted until React hydrates and animates it back. That alone was
+            the entire 2.0s LCP -- on a page interactive in 30ms. Shortening the
+            delay did nothing, because the delay was never the gate; hydration
+            was.
+
+            Everything around it still stages. This one block renders with the
+            HTML, which is what the metric is actually asking for.
+          */}
+          <p className="type-lead mt-6 max-w-md text-quiet">
             Social media marketing designed to help your business build a stronger online
             presence, connect with the right audience, and show up consistently.
-          </motion.p>
+          </p>
 
           <motion.div
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 1, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.7, delay: 0.56, ease: [0.16, 1, 0.3, 1] }}
             className="mt-10 flex flex-wrap items-center gap-4"
           >
             <Button href="/contact" size="lg" trailingIcon={<ArrowRight />}>
@@ -115,7 +124,7 @@ export function Hero() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 1.15 }}
+            transition={{ duration: 0.7, delay: 0.7 }}
             /* On narrow viewports this line lands on the seabed, where white
                measures 1.69:1. Same fix as the sill and the figure labels: its
                own flat chip, rather than darkening sand until it stops reading
@@ -168,7 +177,7 @@ export function Hero() {
                 key={mark.label}
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 1.2 + i * 0.1 }}
+                transition={{ duration: 0.6, delay: 0.8 + i * 0.07 }}
               >
                 <dt className="type-label-sm text-quieter">{mark.label}</dt>
                 <dd className="font-display mt-2 text-xl tracking-tight md:text-2xl">
@@ -182,7 +191,7 @@ export function Hero() {
             href="#services"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 1.5 }}
+            transition={{ duration: 0.8, delay: 1.0 }}
             className="type-label-sm group inline-flex items-center gap-3 self-start text-quieter transition-colors hover:text-bone sm:self-end"
           >
             Scroll
