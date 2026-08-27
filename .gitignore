@@ -48,3 +48,11 @@ secrets.json
 
 # machine-local Claude Code settings
 .claude/settings.local.json
+
+# agent-harness scratch: session locks, broadcast files, failure counters and
+# the SDD workspace. Machine-local state, not project source.
+.claude/sessions/
+.claude/state/
+.claude/worktrees/
+.harness-worktrees/
+.superpowers/
