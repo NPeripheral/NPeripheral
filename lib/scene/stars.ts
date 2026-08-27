@@ -80,11 +80,13 @@ const FRAG = /* glsl */ `
         // Envelope over one life: in, hold, out. Raised to a power so it spends
         // most of the cycle faint and only briefly bright -- a sky that is
         // always fully lit reads as a texture.
-        float env = pow(sin(life * 3.14159265), 1.6);
+        // A gentler curve: still fades in and out, but holds long enough to be
+        // looked at. At 1.6 the star was only legible for a fraction of its life.
+        float env = pow(sin(life * 3.14159265), 0.9);
 
         // The twinkle itself, on its own period so it never syncs with the life
         // cycle or with a neighbour.
-        float tw = 0.55 + 0.45 * sin(uTime * (2.2 + hp.x * 3.4) + hp.y * 6.2831);
+        float tw = 0.70 + 0.30 * sin(uTime * (2.2 + hp.x * 3.4) + hp.y * 6.2831);
 
         float bright = env * tw;
         if (bright <= 0.001) continue;
@@ -94,8 +96,15 @@ const FRAG = /* glsl */ `
         // the hash pushes most values to the floor so the sky is mostly small
         // points with the occasional large one. That ratio is what makes a
         // starfield read as depth rather than as a pattern.
-        float grade = hp.y * hp.y * hp.y;
-        float size = mix(0.013, 0.088, grade);
+        // Sized against real pixels, not taste. A cell is viewport-height/6,
+        // about 143px at 860px tall, so these are the multipliers that land a
+        // small star around 7px and a large one around 19px. Cubing the hash
+        // (the previous attempt) put the MEDIAN star at 3px, which is the same
+        // invisible failure as the first version -- reintroduced by the
+        // distribution rather than the range. Squaring keeps "most are small"
+        // without pushing small below the point it can be seen.
+        float grade = hp.y * hp.y;
+        float size = mix(0.045, 0.155, grade);
 
         float core = sparkle(f - pos, size) * bright;
         float halo = smoothstep(size * 2.6, 0.0, length(f - pos)) * bright * 0.18;
