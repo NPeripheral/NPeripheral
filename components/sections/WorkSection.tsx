@@ -21,7 +21,7 @@ export function WorkSection({ standalone = false }: { standalone?: boolean }) {
   const hasConcepts = workItems.some((item) => item.kind === "concept");
 
   return (
-    <section id="work" className="ground-cream relative py-24 md:py-36">
+    <section id="work" className="ground-ink relative py-24 md:py-36">
       <div className="shell">
         {standalone ? null : (
           <div className="rule-b flex flex-col gap-6 pb-10 md:flex-row md:items-end md:justify-between">

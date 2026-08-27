@@ -158,3 +158,76 @@ export function StaggerItem({
     </MotionTag>
   );
 }
+
+const SNAP = [0.2, 1.4, 0.4, 1] as const;
+const SOFT = [0.22, 1, 0.36, 1] as const;
+
+/**
+ * The Persona 5 entrance. Distinct from <Stagger> on purpose.
+ *
+ * Stagger is for prose arriving; Cascade is for a mechanism firing. It is fast
+ * (45ms apart, 420ms each, under 700ms total) because past ~700ms a sequence
+ * stops reading as one event and starts reading as a queue — and the whole
+ * premise is that this is an event.
+ *
+ * Budget: at most one per chapter, and only on genuine enumerations. If it
+ * becomes the site's default entrance it stops being spectacle.
+ */
+export function Cascade({ children, className }: { children: ReactNode; className?: string }) {
+  const reduced = useReducedMotion();
+  return (
+    <motion.div
+      className={className}
+      initial={reduced ? "show" : "hidden"}
+      whileInView="show"
+      viewport={{ once: true, amount: 0.2 }}
+      variants={{ hidden: {}, show: { transition: { staggerChildren: 0.045 } } }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/**
+ * `as` exists because the first real caller is a <ul> of services, and
+ * `ul > div > li` is invalid HTML. Restricted to the two tags actually needed
+ * rather than a generic ElementType, so framer-motion's props stay typed.
+ */
+export function CascadeItem({
+  children,
+  className,
+  as = "div",
+}: {
+  children: ReactNode;
+  className?: string;
+  as?: "div" | "li";
+}) {
+  const reduced = useReducedMotion();
+  const Tag = as === "li" ? motion.li : motion.div;
+  if (reduced) {
+    return as === "li" ? <li className={className}>{children}</li> : <div className={className}>{children}</div>;
+  }
+  return (
+    <Tag
+      className={className}
+      variants={{
+        // Travel is along the 6.5° cut axis, so entrance and layout share one
+        // vector. Opacity finishes early on a non-overshooting curve — an
+        // overshoot under a semi-transparent item is invisible.
+        hidden: { x: -21.86, y: -2.49, opacity: 0 },
+        show: {
+          x: 0,
+          y: 0,
+          opacity: 1,
+          transition: {
+            x: { duration: 0.42, ease: SNAP },
+            y: { duration: 0.42, ease: SNAP },
+            opacity: { duration: 0.2, ease: SOFT },
+          },
+        },
+      }}
+    >
+      {children}
+    </Tag>
+  );
+}

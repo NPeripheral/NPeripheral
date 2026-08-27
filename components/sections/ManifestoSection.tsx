@@ -3,6 +3,7 @@
 import { WordWash } from "@/components/motion/Lines";
 import { Reveal } from "@/components/motion/Reveal";
 import { positioning } from "@/lib/data/about";
+import { DiagonalCut } from "@/components/motion/DiagonalCut";
 
 /**
  * Chapter 01 — the argument, on cream.
@@ -13,7 +14,8 @@ import { positioning } from "@/lib/data/about";
  */
 export function ManifestoSection() {
   return (
-    <section className="ground-cream relative py-28 md:py-44">
+    <section className="ground-cream cut-top relative py-28 md:py-44">
+      <DiagonalCut />
       <div className="shell">
         <Reveal mode="fade">
           <div className="rule-b flex items-baseline gap-4 pb-3">

@@ -38,7 +38,7 @@ const sizes: Record<NonNullable<CommonProps["size"]>, string> = {
 };
 
 const variants: Record<NonNullable<CommonProps["variant"]>, string> = {
-  primary: "bg-ember text-[#fff6f1] hover:text-ink",
+  primary: "bg-ember text-[var(--on-ember)] hover:text-ink",
   secondary: "border border-[var(--rule,var(--color-line))] text-current hover:text-ink",
   outline: "border border-ember text-ember hover:text-[#fff6f1]",
   ghost: "text-current hover:text-ember",

@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { DiagonalCut } from "@/components/motion/DiagonalCut";
 
 /**
  * Chapter 13 — the manifesto.
@@ -24,9 +25,10 @@ export function BrandStatement() {
   return (
     <section
       ref={ref}
-      className="ground-ember relative flex min-h-[85svh] flex-col justify-center overflow-hidden py-24"
+      className="ground-ember cut-top relative flex min-h-[85svh] flex-col justify-center overflow-hidden py-24"
       aria-label="Appear to your audience"
     >
+      <DiagonalCut />
       <motion.div
         style={reduced ? undefined : { x: driftLeft }}
         aria-hidden

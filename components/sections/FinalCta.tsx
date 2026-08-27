@@ -5,6 +5,7 @@ import { Lines } from "@/components/motion/Lines";
 import { Reveal } from "@/components/motion/Reveal";
 import { Aperture } from "@/components/visual/Aperture";
 import { siteConfig } from "@/lib/site-config";
+import { DiagonalCut } from "@/components/motion/DiagonalCut";
 
 /**
  * The close.
@@ -14,7 +15,8 @@ import { siteConfig } from "@/lib/site-config";
  */
 export function FinalCta() {
   return (
-    <section id="contact-cta" className="ground-ink relative overflow-hidden py-24 md:py-36">
+    <section id="contact-cta" className="ground-ink cut-top relative py-24 md:py-36">
+      <DiagonalCut />
       <div className="shell">
         <div className="rule-b flex items-baseline gap-4 pb-3">
           <span className="type-label-sm text-ember">11</span>

@@ -4,8 +4,9 @@ import { useRef } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { Button, ArrowRight } from "@/components/ui/Button";
 import { Lines } from "@/components/motion/Lines";
-import { Aperture } from "@/components/visual/Aperture";
 import { siteConfig } from "@/lib/site-config";
+import { SceneSlot } from "@/components/scene/SceneSlot";
+import { OceanGate } from "@/components/scene/OceanGate";
 
 /**
  * Chapter 00.
@@ -28,6 +29,7 @@ const marks = [
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
+  const sillRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -40,10 +42,12 @@ export function Hero() {
   return (
     <section
       ref={ref}
-      className="ground-ink relative flex min-h-[100svh] flex-col justify-between overflow-hidden pt-28 md:pt-32"
+      className="ground-sea relative flex min-h-[100svh] flex-col justify-between overflow-hidden pt-28 md:pt-32"
       aria-labelledby="hero-heading"
     >
-      <div className="shell grid flex-1 items-center gap-12 lg:grid-cols-12 lg:gap-10">
+      <div className="relative flex flex-1 flex-col">
+        <OceanGate />
+        <div className="shell relative z-10 grid flex-1 items-center gap-12 lg:grid-cols-12 lg:gap-10">
         <motion.div
           style={reduced ? undefined : { y: typeY }}
           className="lg:col-span-7 lg:pr-10 xl:col-span-6"
@@ -73,11 +77,22 @@ export function Hero() {
             ]}
           />
 
+          {/* The line that names what the work actually is, and what the mark
+              on the masthead means. It arrives after the headline has landed. */}
+          <motion.p
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="type-lead mt-7 font-display text-[1.5rem] leading-tight text-bone"
+          >
+            We discover buried treasure.
+          </motion.p>
+
           <motion.p
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.85, ease: [0.16, 1, 0.3, 1] }}
-            className="type-lead mt-9 max-w-md text-quiet"
+            transition={{ duration: 0.9, delay: 0.95, ease: [0.16, 1, 0.3, 1] }}
+            className="type-lead mt-6 max-w-md text-quiet"
           >
             Social media marketing designed to help your business build a stronger online
             presence, connect with the right audience, and show up consistently.
@@ -101,7 +116,11 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.15 }}
-            className="type-label-sm mt-6 leading-[1.7] text-quieter"
+            /* On narrow viewports this line lands on the seabed, where white
+               measures 1.69:1. Same fix as the sill and the figure labels: its
+               own flat chip, rather than darkening sand until it stops reading
+               as sand. inline-block so the chip wraps the text, not the column. */
+            className="type-label-sm mt-6 inline-block bg-black/80 px-3 py-2 leading-[1.7] text-white"
           >
             {siteConfig.responsePromise}
           </motion.p>
@@ -121,12 +140,8 @@ export function Hero() {
               transition={{ duration: 1.3, delay: 0.55, ease: [0.76, 0, 0.24, 1] }}
               style={{ willChange: "transform" }}
             >
-              <Aperture
-                figure="lens"
+              <SceneSlot
                 tone="ink"
-                anchor="center"
-                dot={4}
-                interactive
                 label="Field of view"
                 index="Fig. 01"
                 className="h-[34vh] w-full border border-[var(--color-line)] sm:h-[40vh] lg:h-[62vh]"
@@ -134,10 +149,19 @@ export function Hero() {
             </motion.div>
           </div>
         </motion.div>
+        </div>
       </div>
 
-      <motion.div style={reduced ? undefined : { opacity: fade }} className="shell pb-8 pt-14">
-        <div className="rule-t flex flex-col gap-6 pt-6 sm:flex-row sm:items-end sm:justify-between">
+      <motion.div
+        ref={sillRef}
+        style={reduced ? undefined : { opacity: fade }}
+        className="relative z-10 mt-14 bg-black"
+      >
+        {/* The sill: the line the water stops at. Its own flat black ground so
+            the marks below read at full contrast instead of fighting the sand,
+            and the scene is scissored to end exactly at its top edge. */}
+        <div className="shell pb-8 pt-6">
+        <div className="flex flex-col gap-6 border-t border-white/40 pt-6 sm:flex-row sm:items-end sm:justify-between">
           <dl className="flex flex-wrap gap-x-10 gap-y-5">
             {marks.map((mark, i) => (
               <motion.div
@@ -170,6 +194,7 @@ export function Hero() {
               />
             </span>
           </motion.a>
+        </div>
         </div>
       </motion.div>
     </section>

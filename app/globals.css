@@ -34,6 +34,25 @@
   --color-ember-2: #f0894b;
   --color-ember-ink: #8f2f13;
 
+  /* Foreground for anything filled with the accent. A ground that retunes
+     --color-ember must retune this with it or the fill and its label collide. */
+  --on-ember: #fff6f1;
+
+  /* --- Underwater: the landing scene ------------------------------------
+     A separate register from the ink/ember system on purpose -- this is the
+     one chapter that leaves the warm ground. Sunlit shallows: a light shaft
+     colour, a mid body colour for the school, and a deep floor. */
+  --color-sea-light: #bfe8f5;
+  /* The surface stop is set by contrast, not by taste: white body text over
+     the old #4aa3c4 measured 2.87:1, well under AA. #26708c measures 5.56:1
+     and is still unmistakably sunlit water. Anything lighter here silently
+     breaks every headline and label in the chapter. */
+  --color-sea: #26708c;
+  --color-sea-deep: #0d3b52;
+  --color-sea-floor: #06222f;
+  --color-sand: #c9b48c;
+  --color-sand-shadow: #4a6b74;
+
   /* --- Hairlines -------------------------------------------------------- */
   --color-line: rgba(244, 239, 230, 0.14);
   --color-line-soft: rgba(244, 239, 230, 0.07);
@@ -66,6 +85,32 @@
   --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* --- Cascade: the Persona 5 entrance, used in the seams only ----------
+     --ease-snap overshoots ~8%. --ease-premium is expo-out and mathematically
+     cannot overshoot, which is why this curve is new rather than reused.
+     Overshoot is applied to transform ONLY; opacity clamps at 1 and a back
+     curve on it produces a dead flat spot. */
+  --ease-snap: cubic-bezier(0.2, 1.4, 0.4, 1);
+  --cascade-step: 45ms;
+  --cascade-dur: 420ms;
+
+  /* Travel is 22px along the 6.5° cut axis: (cos 6.5°, sin 6.5°) × 22.
+     Cascade and cuts sharing one axis is what makes the system read as
+     authored rather than assembled. */
+  --cascade-x: 21.86px;
+  --cascade-y: 2.49px;
+
+  /* --- Diagonal cuts ----------------------------------------------------
+     6.5° is derived, not chosen: the 1344px shell gives 416px columns and
+     48px gutters, and atan(48/416) = 6.58°. Expressing the rise in vw keeps
+     the angle constant at every breakpoint. */
+  /* Clamped, not raw vw. cut-top pulls a section up by a full rise, so at
+     1920px an unbounded 11.5vw = 221px overlaps 77px of the previous chapter's
+     content (its padding is 144px), and 150px at 2560px -- more than a line of
+     body copy, swallowed opaquely. The clamp holds the 6.5deg angle across the
+     range people actually browse at and stops eating content past it. */
+  --cut-rise: clamp(48px, 11.5vw, 144px);
 
   /* --- Radii: nearly none. Editorial pages have corners.
      The whole scale is flattened so that any legacy `rounded-*` class in the
@@ -318,6 +363,33 @@ h4,
   --color-ember: #b8401c;
 }
 
+/* The landing chapter, and the only place the site leaves its warm ground.
+   Sunlit shallows: a deep floor beneath, lighter toward the surface. The
+   3D shafts and school render over this, and page content sits above both. */
+@utility ground-sea {
+  background: linear-gradient(
+    180deg,
+    var(--color-sea) 0%,
+    var(--color-sea-deep) 58%,
+    var(--color-sea-floor) 100%
+  );
+  color: #fff;
+  --rule: rgba(255, 255, 255, 0.34);
+  --rule-soft: rgba(255, 255, 255, 0.16);
+  --quiet: #fff;
+  --quieter: rgba(255, 255, 255, 0.72);
+
+  /* The accent is retired in this chapter. Ember against sunlit blue reads as
+     a clash rather than an accent, so everything set in it resolves to white --
+     the same mechanism ground-cream already uses to darken ember for contrast.
+     One override here fixes every component inside the chapter; none of them
+     need to know they are underwater. */
+  --color-ember: #fff;
+  --color-ember-2: #fff;
+  /* the accent is white here, so its label has to be dark */
+  --on-ember: var(--color-ink);
+}
+
 @utility ground-ember {
   background: var(--color-ember);
   color: #fff6f1;
@@ -325,6 +397,29 @@ h4,
   --rule-soft: rgba(255, 246, 241, 0.14);
   --quiet: rgba(255, 246, 241, 0.82);
   --quieter: rgba(255, 246, 241, 0.6);
+}
+
+/* A chapter boundary that rakes 6.5° instead of sitting flat.
+
+   The section pulls up by one rise and clips its own top corner away, so the
+   PREVIOUS chapter's ground shows through the notch. That is why this only
+   works where the ground actually changes — over a matching ground it is
+   invisible, which is the intended constraint, not a limitation. */
+@utility cut-top {
+  margin-top: calc(-1 * var(--cut-rise));
+  clip-path: polygon(0 0, 100% var(--cut-rise), 100% 100%, 0 100%);
+  padding-top: var(--cut-rise);
+}
+
+/* Reversed rake. Reserved for the one boundary where the meaning itself
+   reverses -- currently unused: with ground-ink-2 retired, StarterSection and
+   DiptychSection share a ground, so the Diptych's top edge has no boundary to
+   rake and its reversal lives in its own internal A/B seam instead. Kept
+   because a second direction must exist for the first to read as a choice. */
+@utility cut-top-reverse {
+  margin-top: calc(-1 * var(--cut-rise));
+  clip-path: polygon(0 var(--cut-rise), 100% 0, 100% 100%, 0 100%);
+  padding-top: var(--cut-rise);
 }
 
 @utility rule-t {
@@ -351,6 +446,14 @@ h4,
    ========================================================================== */
 
 @utility shell {
+  /* Lifts page content above the fixed scene canvas (z-5).
+     Without this the leaves composite OVER body copy on every section that
+     does not lift its own content: at 0.42 opacity a cream-3 leaf drops
+     ink-on-cream from 17.4:1 to 2.49:1, and on ground-ember to 1.93:1 --
+     below AA even for large text. Setting it here rather than per-section
+     means a new section cannot forget it. */
+  position: relative;
+  z-index: 10;
   width: 100%;
   max-width: 92rem;
   margin-inline: auto;
