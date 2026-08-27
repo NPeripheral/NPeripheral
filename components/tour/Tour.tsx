@@ -186,7 +186,7 @@ export function Tour({ steps, storageKey, label = "Take the tour", className, au
                 A {steps.length}-step walkthrough of what everything on this page means.
               </p>
               <div className="mt-5 flex items-center gap-5">
-                <button type="button" onClick={start} className="type-label link-underline text-bone">
+                <button type="button" onClick={start} className="type-label link-underline py-2 text-bone">
                   Start the tour
                 </button>
                 <button

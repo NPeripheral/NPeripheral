@@ -74,7 +74,7 @@ export function HelpIndex() {
             Ask us directly — a person answers, and it is usually faster than
             searching anyway.
           </p>
-          <Link href="/contact" className="type-label link-underline mt-6 inline-block text-ember">
+          <Link href="/contact" className="type-label link-underline mt-6 inline-block py-2 text-ember">
             Ask a question
           </Link>
         </div>

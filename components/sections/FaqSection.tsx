@@ -33,7 +33,7 @@ export function FaqSection() {
             </p>
             <Link
               href="/contact"
-              className="type-label link-underline mt-7 inline-block text-ember"
+              className="type-label link-underline mt-7 inline-block py-2 text-ember"
             >
               Get a custom quote
             </Link>

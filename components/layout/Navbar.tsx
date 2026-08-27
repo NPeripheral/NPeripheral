@@ -197,7 +197,7 @@ export function Navbar() {
                         href={social.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="type-label-sm link-underline text-quiet"
+                        className="type-label-sm link-underline inline-block py-2 text-quiet"
                       >
                         {social.label}
                       </a>

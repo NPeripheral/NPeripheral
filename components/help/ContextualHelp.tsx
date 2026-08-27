@@ -123,7 +123,7 @@ export function ContextualHelp({ className, variant = "icon" }: { className?: st
               <Link
                 href={href}
                 onClick={() => setOpen(false)}
-                className="type-label link-underline text-ember"
+                className="type-label link-underline inline-block py-2 text-ember"
               >
                 {topic ? "Read the full answer" : "Open the help centre"}
               </Link>
