@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Fraunces, JetBrains_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { siteConfig, socialLinks } from "@/lib/site-config";
 import { Navbar } from "@/components/layout/Navbar";
@@ -173,16 +172,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${fraunces.variable} ${jetbrains.variable} h-full`}
     >
       <body className="flex min-h-full flex-col bg-ink font-sans text-bone antialiased">
-        <Script
+        <script
           id="ld-organization"
           type="application/ld+json"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
-        <Script
+        <script
           id="ld-website"
           type="application/ld+json"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
 

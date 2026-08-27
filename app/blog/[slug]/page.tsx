@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Script from "next/script";
 import { notFound } from "next/navigation";
 import { getAllPosts, getPostBySlug } from "@/lib/sanity";
 import { blogPosts } from "@/lib/data/blog-posts";
@@ -61,7 +60,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
 
   return (
     <>
-      <Script
+      <script
         id="ld-article"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}

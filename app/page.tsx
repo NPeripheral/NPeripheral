@@ -1,4 +1,3 @@
-import Script from "next/script";
 import { Hero } from "@/components/hero/Hero";
 import { SignalTicker } from "@/components/sections/SignalTicker";
 import { ManifestoSection } from "@/components/sections/ManifestoSection";
@@ -66,7 +65,7 @@ export const metadata = {
 export default function Home() {
   return (
     <>
-      <Script
+      <script
         id="ld-faq"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
