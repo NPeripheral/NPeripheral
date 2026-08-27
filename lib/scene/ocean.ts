@@ -27,7 +27,7 @@ import { createSeabed } from "./seabed";
 const SHAFTS = 9;
 const FISH = 18;
 
-/** A fish is a vesica with a tail — the same lens shape the leaves use. */
+/** A fish is a vesica with a tail — the same lens shape as an aperture blade. */
 function fishShape(): Shape {
   const s = new Shape();
   s.moveTo(-0.5, 0);

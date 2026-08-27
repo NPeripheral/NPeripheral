@@ -1,7 +1,7 @@
 import { OrthographicCamera, Scene, WebGLRenderer } from "three";
 import { CHAPTERS, type ChapterName, type ChapterState } from "./chapters";
 import { createAperture } from "./aperture";
-import { createLeaves } from "./leaves";
+import { createStars } from "./stars";
 import { createOcean } from "./ocean";
 import { palette } from "./palette";
 
@@ -44,9 +44,9 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
 
   const p = palette();
   const aperture = createAperture(p.ember);
-  const leaves = createLeaves(p.ink4, p.ember);
+  const stars = createStars(p.bone, p.ember);
   const ocean = createOcean(p.seaLight, p.sea, p.bone, p.seaDeep, p.sand, p.sandShadow);
-  scene.add(aperture.group, leaves.mesh, ocean.group);
+  scene.add(aperture.group, stars.mesh, ocean.group);
 
   // The ocean is the landing chapter only. Everywhere else the scene returns to
   // the ink/ember register the rest of the site is built in.
@@ -80,7 +80,10 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
   let destroyed = false;
 
   function sizeToViewport() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // 1.5 rather than 2: 44% fewer pixels per frame for no visible difference
+    // on a field of soft stars and a flat-shaded iris. At DPR 2 this canvas was
+    // pushing 2.21 Mpx a frame.
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     const w = window.innerWidth;
     const h = window.innerHeight;
     renderer.setPixelRatio(dpr);
@@ -149,7 +152,6 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
     // pass 1 -- the ocean, clipped to the water line
     if (underwater && applyOceanScissor()) {
       ocean.group.visible = true;
-      leaves.mesh.visible = false;
       const hadAperture = aperture.group.visible;
       aperture.group.visible = false;
       renderer.render(scene, camera);
@@ -159,13 +161,19 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
     // pass 2 -- everything else, unclipped
     renderer.setScissorTest(false);
     ocean.group.visible = false;
-    leaves.mesh.visible = !underwater;
     renderer.render(scene, camera);
   }
+
+  // ~30fps. A twinkle and a slow drift are indistinguishable from 60, and this
+  // halves every cost below at a stroke.
+  const FRAME_MS = 1000 / 30;
+  let lastDraw = 0;
 
   function frame(now: number) {
     if (destroyed) return;
     if (!visible) { running = false; return; }
+    if (now - lastDraw < FRAME_MS) { raf = requestAnimationFrame(frame); return; }
+    lastDraw = now;
     const dt = Math.min((now - last) / 1000, 1 / 30);
     last = now;
     t += dt;
@@ -179,7 +187,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
     aperture.apply(current, reduced ? 0 : t);
     if (!reduced) {
       if (underwater) ocean.update(dt, t);
-      else leaves.update(dt);
+      stars.update(t);
     }
     placeAperture();
     draw();
@@ -243,12 +251,14 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
       oceanRoute = name === "home";
       if (!oceanRoute) oceanInView = false;
       syncOcean();
-      if (!reduced) { leaves.burst(); start(); }
+      if (!reduced) start();
       else { placeAperture(); draw(); }
     },
     setGround(name) {
+      // Stars belong to night. On the light chapters they fade almost out
+      // rather than becoming grey specks on cream.
       const onLight = name === "ground-cream" || name === "ground-ember";
-      leaves.setGround(onLight ? p.cream3 : p.ink4, p.ember);
+      stars.setTone(onLight ? p.ink4 : p.bone, p.ember, onLight ? 0.12 : 0.5);
       if (!reduced) start();
       else { placeAperture(); draw(); }
     },
@@ -279,7 +289,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle | null {
       cancelAnimationFrame(stillFrame);
       window.removeEventListener("scroll", onStillScroll);
       aperture.dispose();
-      leaves.dispose();
+      stars.dispose();
       ocean.dispose();
       renderer.dispose();
     },
